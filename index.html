@@ -1021,7 +1021,22 @@ function buildCriticalTrials(items, lang, subjectId){
     ? ['canonical','inverted']
     : ['canonical','reduplicated-inside','reduplicated-outside'];
   const magnitudes = [2,3,4,6,8,10];
-  const parity = subjectId % conditions.length;
+
+  // v5 fix: subjectId is a STRING (e.g. 's12345678' or a Prolific PID like
+  // 'abc12def3'). The previous `subjectId % conditions.length` returned NaN
+  // for non-numeric strings, which silently produced an array of `undefined`
+  // condition assignments and crashed downstream. We hash the string to a
+  // non-negative integer first, so the parity is well-distributed regardless
+  // of ID format. DJB2 is more than sufficient for this purpose.
+  const hashString = (s) => {
+    let h = 5381;
+    s = String(s);
+    for (let i = 0; i < s.length; i++) {
+      h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;  // unsigned 32-bit
+    }
+    return h;
+  };
+  const parity = hashString(subjectId) % conditions.length;
 
   // Step 1: assign conditions via Latin square (unchanged).
   const condAssignments = items.map((_, i) => conditions[(i + parity) % conditions.length]);
