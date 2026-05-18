@@ -3,10 +3,10 @@ title: "Topology of Grammar — Study 1 (jsPsych implementation)"
 message: "If you use this software, please cite both the software and the associated proposal."
 type: software
 authors:
-  - family-names: "[Your surname]"
-    given-names: "[Your given names]"
+  - family-names: "Sengupta"
+    given-names: "Rakesh"
     affiliation: "Krea University"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0000-0003-1768-0551"
 keywords:
   - psycholinguistics
   - self-paced reading
@@ -15,14 +15,6 @@ keywords:
   - Cinque hierarchy
   - jsPsych
 license: MIT
-repository-code: "https://github.com/[your-username]/topology-of-grammar"
+repository-code: "https://github.com/rakesh-sengupta/topology_grammar_study1"
 version: "1.0.0"
 date-released: "2026-05"
-references:
-  - type: article
-    title: "The Topology of Grammar: Projectivity, Block-Degree, and the Attentional Cost of Number"
-    authors:
-      - family-names: "[Your surname]"
-        given-names: "[Your given names]"
-    year: 2026
-    notes: "Accompanying theoretical proposal"
