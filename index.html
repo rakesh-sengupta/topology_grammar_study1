@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topology of Grammar — Study 1</title>
+
+<!-- jsPsych 8 -->
+<script src="https://unpkg.com/jspsych@8.0.2"></script>
+<link rel="stylesheet" href="https://unpkg.com/jspsych@8.0.2/css/jspsych.css">
+<script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0"></script>
+<script src="https://unpkg.com/@jspsych/plugin-html-button-response@2.0.0"></script>
+<script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0"></script>
+<script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0"></script>
+<script src="https://unpkg.com/@jspsych/plugin-fullscreen@2.0.0"></script>
+<script src="https://unpkg.com/@jspsych/plugin-preload@2.0.0"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600&family=JetBrains+Mono&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#f7f5f0;
+  --paper:#ffffff;
+  --ink:#1c1a17;
+  --muted:#6b6660;
+  --rule:#d8d3c8;
+  --accent:#7a3d2a;
+  --soft:#f0ede6;
+  --gray:#a39d92;
+}
+*{ box-sizing:border-box; }
+html,body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif;
+  margin:0; padding:0;
+  min-height:100vh;
+}
+.jspsych-display-element{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:16px;
+  color:var(--ink);
+  width:100%;
+}
+.jspsych-content-wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.jspsych-content{
+  max-width:760px;
+  width:100%;
+  padding:36px 40px;
+  background:var(--paper);
+  border:1px solid var(--rule);
+  border-radius:3px;
+  text-align:left;
+}
+h1,h2,h3{ font-family:'Crimson Pro',Georgia,serif; font-weight:600; margin-top:0; }
+h1{ font-size:28px; margin-bottom:8px; }
+h2{ font-size:22px; margin-bottom:12px; }
+p{ line-height:1.55; margin:0 0 12px; }
+.muted{ color:var(--muted); }
+strong{ color:var(--ink); }
+.kbd{
+  font-family:'JetBrains Mono',monospace; font-size:12px;
+  padding:2px 8px; border:1px solid var(--rule); border-radius:3px;
+  background:var(--soft);
+  display:inline-block;
+}
+.smallcaps{
+  text-transform:uppercase; letter-spacing:.18em; font-size:11px;
+  color:var(--accent); font-weight:600; margin-bottom:8px;
+}
+.lede{
+  font-family:'Crimson Pro',Georgia,serif;
+  font-size:18px; line-height:1.5; color:#3a3631; margin-bottom:16px;
+}
+
+/* Buttons */
+.jspsych-btn{
+  font-family:'Inter',sans-serif; font-size:14px;
+  padding:10px 22px; background:var(--ink); color:#fff;
+  border:none; border-radius:3px; cursor:pointer;
+  margin:6px 4px;
+}
+.jspsych-btn:hover{ background:#3a3631; }
+
+/* Surveys */
+.jspsych-survey-text-question, .jspsych-survey-multi-choice-question{ margin-bottom:14px; }
+.jspsych-survey-text-question label,
+.jspsych-survey-multi-choice-text{
+  display:block; font-size:14px; color:#3a3631;
+  margin-bottom:6px; font-weight:500;
+}
+.jspsych-survey-text-question input,
+.jspsych-survey-multi-choice-question input[type="text"]{
+  font-family:'Inter',sans-serif; font-size:15px;
+  padding:8px 12px; border:1px solid var(--rule); border-radius:3px;
+  background:#fdfcf9;
+}
+.jspsych-survey-multi-choice-option{ margin:4px 0; }
+.jspsych-survey-multi-choice-option label{ font-size:15px; cursor:pointer; }
+
+/* SPR display */
+.spr-stage{
+  min-height:240px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:20px 0;
+}
+.spr-text{
+  font-family:'Crimson Pro',Georgia,serif;
+  font-size:28px; line-height:1.7;
+  text-align:left;
+  max-width:680px;
+  white-space:pre-wrap;
+}
+.spr-text.bn{
+  font-family:'Noto Sans Bengali',sans-serif;
+  font-size:30px; line-height:1.9;
+}
+.spr-mask{ color:var(--gray); letter-spacing:.04em; }
+.spr-hint{ margin-top:48px; color:var(--muted); font-size:13px; transition:opacity .2s; }
+.spr-hint.hidden{ opacity:0; }
+
+.fixation{ font-size:46px; text-align:center; font-family:Georgia,serif; }
+
+/* Comp Q */
+.compq{ font-family:'Crimson Pro',Georgia,serif; font-size:22px; text-align:center; margin-bottom:18px; }
+.compq.bn{ font-family:'Noto Sans Bengali',sans-serif; font-size:24px; }
+
+/* Canvas */
+#mot-canvas, #enum-canvas{
+  background:#fafaf6; border:1px solid var(--rule);
+  display:block; margin:0 auto;
+}
+.task-status{
+  margin-top:14px; font-size:14px;
+  color:var(--muted); text-align:center;
+}
+
+/* Digit span */
+.digit-display{
+  font-family:'JetBrains Mono',monospace;
+  font-size:78px; text-align:center; padding:60px 0;
+  letter-spacing:.05em;
+}
+.digit-input{
+  font-family:'JetBrains Mono',monospace; font-size:32px;
+  text-align:center; padding:14px 20px;
+  border:1px solid var(--rule); border-radius:3px;
+  width:300px; letter-spacing:.1em; background:#fdfcf9;
+}
+
+/* Demo box */
+.demo{
+  margin:18px 0;
+  padding:20px 22px;
+  background:var(--soft);
+  border:1px solid var(--rule);
+  border-radius:3px;
+}
+.demo-label{
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--accent); font-weight:600; margin-bottom:12px;
+}
+.demo-row{
+  font-family:'Crimson Pro',Georgia,serif;
+  font-size:20px; padding:6px 0;
+  text-align:left;
+}
+.demo-row.bn{ font-family:'Noto Sans Bengali',sans-serif; font-size:22px; }
+.demo-row-label{
+  font-family:'Inter',sans-serif; font-size:12px;
+  color:var(--muted); margin-bottom:2px;
+}
+.demo-arrow{
+  font-family:'Inter',sans-serif; font-size:13px;
+  color:var(--muted); text-align:center;
+  margin:4px 0;
+}
+
+.callout{
+  background:#fff9ef;
+  border-left:3px solid var(--accent);
+  padding:12px 16px;
+  margin:14px 0;
+  font-size:15px;
+  line-height:1.5;
+}
+
+.steps{
+  list-style:none; padding-left:0; margin:12px 0 18px;
+}
+.steps li{
+  padding:8px 0 8px 36px;
+  position:relative;
+  font-size:15px;
+  line-height:1.5;
+}
+.steps li .num{
+  position:absolute; left:0; top:8px;
+  display:inline-block; width:24px; height:24px;
+  background:var(--ink); color:#fff;
+  text-align:center; line-height:24px;
+  border-radius:50%; font-size:12px; font-weight:600;
+}
+
+/* ----- Final summary panel (v4) ----- */
+.final-shell{
+  min-height:100vh; padding:60px 20px;
+  display:flex; justify-content:center; align-items:flex-start;
+}
+.final-card{
+  max-width:880px; width:100%;
+  background:#fff; border:1px solid var(--rule);
+  border-radius:3px; padding:42px 48px;
+  font-family:'Inter',system-ui,sans-serif;
+}
+.final-card h1{ font-family:'Crimson Pro',serif; font-size:28px; margin-top:0; }
+.final-buttons{ display:flex; gap:10px; margin:20px 0 16px; flex-wrap:wrap; }
+.btn-primary, .btn-secondary{
+  font-family:'Inter',sans-serif; font-size:14px;
+  padding:11px 22px; border:none; border-radius:3px;
+  cursor:pointer; text-decoration:none; display:inline-block;
+}
+.btn-primary{ background:var(--ink); color:#fff; }
+.btn-primary:hover{ background:#3a3631; }
+.btn-secondary{
+  background:#fff; color:var(--ink);
+  border:1px solid var(--rule);
+}
+.btn-secondary:hover{ background:var(--soft); }
+.final-sid{ font-size:12px; color:var(--muted); margin-top:0; }
+
+.summary-content{ margin-top:24px; padding-top:24px; border-top:1px solid var(--rule); }
+.summary-content section{ margin-bottom:24px; }
+.summary-content h3{
+  font-family:'Crimson Pro',serif; font-size:17px;
+  margin-bottom:8px; padding-bottom:4px;
+  border-bottom:1px solid var(--soft);
+  color:var(--accent);
+}
+.summary-content h4{
+  font-family:'Inter',sans-serif; font-size:13px;
+  font-weight:600; margin:14px 0 6px;
+  text-transform:uppercase; letter-spacing:.05em;
+  color:var(--muted);
+}
+.summary-content p{ font-size:14px; line-height:1.5; margin:6px 0; }
+.sum-tbl{
+  width:auto; border-collapse:collapse;
+  font-size:13px; margin:4px 0 8px;
+  font-variant-numeric:tabular-nums;
+}
+.sum-tbl th{
+  text-align:left; font-weight:500;
+  padding:4px 14px 4px 0; color:var(--muted);
+  font-size:13px;
+}
+.sum-tbl td{
+  padding:4px 14px 4px 0;
+}
+.sum-tbl.crosstab{ font-family:'JetBrains Mono',monospace; font-size:12px; }
+.sum-tbl.crosstab th{
+  padding:6px 10px; text-align:center;
+  border-bottom:1px solid var(--rule);
+  background:var(--soft);
+}
+.sum-tbl.crosstab td{
+  padding:5px 10px; text-align:center;
+  border-bottom:1px solid var(--soft);
+}
+.sum-tbl.crosstab td.empty{ color:var(--gray); }
+.sum-tbl.crosstab td.marginal, .sum-tbl.crosstab th.marginal{
+  background:#fdfaf3; font-weight:600;
+}
+.sum-tbl .cell-n{ font-size:10px; color:var(--muted); }
+.flags{ list-style:none; padding:0; margin:8px 0; }
+.flags li{
+  padding:8px 12px; margin:6px 0;
+  border-left:3px solid; border-radius:0 3px 3px 0;
+  font-size:13px; line-height:1.45;
+}
+.flags li.flag-info{ background:#f6f4ee; border-left-color:#a39d92; }
+.flags li.flag-warning{ background:#fff4e3; border-left-color:#c79545; }
+.flags li.flag-error{ background:#fce8e3; border-left-color:#a83a3a; }
+.summary-actions{
+  display:flex; gap:8px; margin-top:18px;
+  padding-top:14px; border-top:1px solid var(--soft);
+}
+
+/* Submission-status banners on final screen */
+.status-banner{
+  margin:12px 0 16px;
+  padding:12px 16px;
+  border-radius:3px;
+  font-size:14px;
+  line-height:1.5;
+  background:var(--soft);
+  border-left:3px solid var(--gray);
+}
+.status-banner.status-ok{
+  background:#eef7ee; border-left-color:#3aa055;
+}
+.status-banner.status-warn{
+  background:#fff4e3; border-left-color:#c79545;
+}
+</style>
+</head>
+<body>
+<script>
+/* =========================================================================
+ * Topology of Grammar — Study 1
+ * Krea Computational Cognition Laboratory
+ *
+ * Deployment notes:
+ *   - This is a self-contained, single-file jsPsych 8 experiment.
+ *   - Serves from any static host (GitHub Pages, Netlify, JATOS, your lab
+ *     server, or even file://) and requires only a modern browser.
+ *   - Three deployment modes are supported automatically:
+ *       (1) JATOS:        if window.jatos is detected, results POST via
+ *                         jatos.submitResultData()
+ *       (2) Server POST:  if the URL parameter ?endpoint=https://... is
+ *                         supplied, results POST to that URL
+ *       (3) Browser DL:   otherwise, results are offered as a JSON download
+ *
+ *   URL parameters honoured:
+ *       ?pid=...           participant ID from Prolific / SONA / etc.
+ *                          If absent, a random ID is generated.
+ *       ?endpoint=URL      data POST endpoint (mode 2)
+ *
+ *   See README.md for further deployment instructions.
+ * ========================================================================= */
+
+const DEPLOYMENT_CONFIG = (() => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    participantId: params.get('pid') || params.get('PROLIFIC_PID') ||
+                   params.get('participant_id') || null,
+    studyId:       params.get('study_id') || params.get('STUDY_ID') || null,
+    sessionId:     params.get('session_id') || params.get('SESSION_ID') || null,
+    postEndpoint:  params.get('endpoint') || null,
+    usingJatos:    typeof window.jatos !== 'undefined'
+  };
+})();
+
+/* =========================================================================
+ * Topology of Grammar — Study 1 (v3)
+ *
+ * Architectural change from v2: the dynamic addNodeToEndOfTimeline approach
+ * is abandoned. Instead, both English and Bengali procedures are built up
+ * front, and conditional_function on each procedure ensures only the
+ * appropriate language block runs. This is the standard, reliable jsPsych
+ * pattern.
+ * ========================================================================= */
+
+
+/* =========================================================================
+ * PART 1 — Custom plugins
+ * ========================================================================= */
+
+class MovingWindowSPRPlugin {
+  constructor(jsPsych){ this.jsPsych = jsPsych; }
+  trial(display_element, trial){
+    const words = trial.sentence.split(/\s+/);
+    const langClass = trial.language === 'bn' ? 'bn' : 'en';
+    const maskChar = trial.language === 'bn' ? '\u25CC' : '_';
+    let idx = -1;
+    let pressTimes = [];
+    let started = false;
+
+    const render = () => {
+      let html = '<div class="spr-stage"><div class="spr-text ' + langClass + '">';
+      for(let i=0;i<words.length;i++){
+        const w = words[i];
+        const visible = (i === idx);
+        const masked = visible ? w : w.replace(/\S/g, maskChar);
+        html += '<span class="' + (visible ? 'spr-word' : 'spr-mask') + '">' + masked + '</span>';
+        if(i < words.length - 1) html += ' ';
+      }
+      html += '</div>';
+      const cls = started ? 'spr-hint hidden' : 'spr-hint';
+      html += '<div class="' + cls + '">Press <span class="kbd">SPACE</span> to begin</div>';
+      html += '</div>';
+      display_element.innerHTML = html;
+    };
+    render();
+
+    const onKey = (e) => {
+      if(e.code !== 'Space') return;
+      e.preventDefault();
+      started = true;
+      pressTimes.push(performance.now());
+      idx += 1;
+      if(idx >= words.length){
+        document.removeEventListener('keydown', onKey);
+        const word_rts = [];
+        for(let i=1;i<pressTimes.length;i++){
+          word_rts.push({
+            word_index: i-1,
+            word: words[i-1],
+            rt_ms: pressTimes[i] - pressTimes[i-1]
+          });
+        }
+        display_element.innerHTML = '';
+        this.jsPsych.finishTrial({
+          sentence: trial.sentence,
+          language: trial.language,
+          condition: trial.condition,
+          magnitude: trial.magnitude,
+          item_id: trial.item_id,
+          critical_word_index: trial.critical_word_index,
+          word_rts: word_rts,
+          total_words: words.length
+        });
+      } else {
+        render();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+  }
+}
+MovingWindowSPRPlugin.info = {
+  name: 'moving-window-spr', version: '3.0.0',
+  parameters: {
+    sentence: { type: 'STRING', default: '' },
+    language: { type: 'STRING', default: 'en' },
+    condition: { type: 'STRING', default: '' },
+    magnitude: { type: 'INT', default: null },
+    item_id: { type: 'STRING', default: '' },
+    critical_word_index: { type: 'INT', default: null }
+  },
+  data: {}
+};
+
+
+class MOTPlugin {
+  constructor(jsPsych){ this.jsPsych = jsPsych; }
+  trial(display_element, trial){
+    const W = 680, H = 440;
+    const N = trial.n_objects, K = trial.n_targets;
+    const radius = 22, speed = trial.speed, trackDur = trial.tracking_duration_ms;
+
+    display_element.innerHTML =
+      '<div style="text-align:center">' +
+      '<canvas id="mot-canvas" width="'+W+'" height="'+H+'"></canvas>' +
+      '<div class="task-status" id="mot-status">Memorise the green disks…</div>' +
+      '</div>';
+    const canvas = document.getElementById('mot-canvas');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('mot-status');
+
+    const disks = [];
+    let safety = 0;
+    while(disks.length < N && safety < 1000){
+      const x = radius + Math.random()*(W - 2*radius);
+      const y = radius + Math.random()*(H - 2*radius);
+      let ok = true;
+      for(const d of disks){
+        if(Math.hypot(d.x-x, d.y-y) < 2.6*radius){ ok = false; break; }
+      }
+      safety++;
+      if(!ok) continue;
+      const theta = Math.random()*2*Math.PI;
+      disks.push({ x, y, vx: speed*Math.cos(theta), vy: speed*Math.sin(theta),
+                   isTarget: false, chosen: false });
+    }
+    const targetIdx = this.jsPsych.randomization.sampleWithoutReplacement(
+      Array.from({length:N}, (_,i)=>i), K
+    );
+    for(const i of targetIdx) disks[i].isTarget = true;
+
+    const drawDisk = (d, state) => {
+      ctx.beginPath(); ctx.arc(d.x, d.y, radius, 0, 2*Math.PI);
+      let fill = '#2a2825';
+      if(state === 'cue') fill = '#3aa055';
+      else if(state === 'chosen') fill = '#c8a04c';
+      else if(state === 'feedback-target') fill = '#3aa055';
+      else if(state === 'feedback-wrong') fill = '#a83a3a';
+      ctx.fillStyle = fill; ctx.fill();
+      ctx.strokeStyle = '#1c1a17'; ctx.lineWidth = 1.5; ctx.stroke();
+    };
+    const drawAll = (mode) => {
+      ctx.fillStyle = '#fafaf6'; ctx.fillRect(0,0,W,H);
+      for(const d of disks){
+        let state = 'default';
+        if(mode === 'cue' && d.isTarget) state = 'cue';
+        if(mode === 'response' && d.chosen) state = 'chosen';
+        if(mode === 'feedback'){
+          if(d.isTarget) state = 'feedback-target';
+          else if(d.chosen) state = 'feedback-wrong';
+        }
+        drawDisk(d, state);
+      }
+    };
+
+    drawAll('cue');
+    setTimeout(()=>{
+      status.textContent = 'Track the targets while they move…';
+      drawAll('default');
+      const tStart = performance.now();
+      let raf;
+      const step = () => {
+        const now = performance.now();
+        for(const d of disks){
+          d.x += d.vx; d.y += d.vy;
+          if(d.x < radius){ d.x = radius; d.vx *= -1; }
+          if(d.x > W-radius){ d.x = W-radius; d.vx *= -1; }
+          if(d.y < radius){ d.y = radius; d.vy *= -1; }
+          if(d.y > H-radius){ d.y = H-radius; d.vy *= -1; }
+        }
+        for(let i=0;i<N;i++){
+          for(let j=i+1;j<N;j++){
+            const dx = disks[j].x - disks[i].x;
+            const dy = disks[j].y - disks[i].y;
+            const dist = Math.hypot(dx, dy);
+            if(dist < 2*radius + 1 && dist > 0){
+              const nx = dx/dist, ny = dy/dist;
+              const overlap = 2*radius + 1 - dist;
+              disks[i].x -= nx*overlap/2; disks[i].y -= ny*overlap/2;
+              disks[j].x += nx*overlap/2; disks[j].y += ny*overlap/2;
+              const vi = disks[i].vx*nx + disks[i].vy*ny;
+              const vj = disks[j].vx*nx + disks[j].vy*ny;
+              disks[i].vx += (vj - vi)*nx; disks[i].vy += (vj - vi)*ny;
+              disks[j].vx += (vi - vj)*nx; disks[j].vy += (vi - vj)*ny;
+            }
+          }
+        }
+        drawAll('default');
+        if(now - tStart < trackDur){ raf = requestAnimationFrame(step); }
+        else {
+          cancelAnimationFrame(raf);
+          status.innerHTML = 'Click the <strong>' + K + '</strong> disks you tracked, then press <span class="kbd">ENTER</span>.';
+          drawAll('response');
+          const onClick = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+            for(const d of disks){
+              if(Math.hypot(cx-d.x, cy-d.y) < radius){ d.chosen = !d.chosen; break; }
+            }
+            drawAll('response');
+          };
+          canvas.addEventListener('click', onClick);
+          const onEnter = (e) => {
+            if(e.code !== 'Enter') return;
+            const chosen = disks.filter(d=>d.chosen).length;
+            if(chosen !== K){
+              status.innerHTML = 'Please select exactly <strong>' + K + '</strong>. (Currently selected: ' + chosen + '.)';
+              return;
+            }
+            canvas.removeEventListener('click', onClick);
+            document.removeEventListener('keydown', onEnter);
+            const hits = disks.filter(d=>d.isTarget && d.chosen).length;
+            const fa = disks.filter(d=>!d.isTarget && d.chosen).length;
+            drawAll('feedback');
+            status.innerHTML = '<strong>' + hits + '</strong> of ' + K + ' targets tracked.';
+            setTimeout(()=>{
+              display_element.innerHTML = '';
+              this.jsPsych.finishTrial({
+                n_objects: N, n_targets: K,
+                hits, false_alarms: fa, accuracy: hits / K
+              });
+            }, 1800);
+          };
+          document.addEventListener('keydown', onEnter);
+        }
+      };
+      raf = requestAnimationFrame(step);
+    }, 2000);
+  }
+}
+MOTPlugin.info = {
+  name: 'mot', version: '3.0.0',
+  parameters: {
+    n_objects: { type: 'INT', default: 8 },
+    n_targets: { type: 'INT', default: 4 },
+    tracking_duration_ms: { type: 'INT', default: 7000 },
+    speed: { type: 'FLOAT', default: 3.5 }
+  },
+  data: {}
+};
+
+
+class EnumerationPlugin {
+  constructor(jsPsych){ this.jsPsych = jsPsych; }
+  trial(display_element, trial){
+    const W = 480, H = 360, N = trial.n_dots, dotR = 9;
+
+    display_element.innerHTML =
+      '<div style="text-align:center">' +
+      '<canvas id="enum-canvas" width="'+W+'" height="'+H+'"></canvas>' +
+      '<div class="task-status">Fixate the centre…</div>' +
+      '</div>';
+    const canvas = document.getElementById('enum-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const drawFixation = () => {
+      ctx.fillStyle = '#fafaf6'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = '#1c1a17';
+      ctx.fillRect(W/2-1, H/2-8, 2, 16); ctx.fillRect(W/2-8, H/2-1, 16, 2);
+    };
+    const positions = [];
+    let safety = 0;
+    while(positions.length < N && safety < 5000){
+      const x = dotR*2 + Math.random()*(W - 4*dotR);
+      const y = dotR*2 + Math.random()*(H - 4*dotR);
+      let ok = true;
+      for(const p of positions){
+        if(Math.hypot(p.x-x, p.y-y) < 3.4*dotR){ ok = false; break; }
+      }
+      if(ok) positions.push({x,y});
+      safety++;
+    }
+    const drawDots = () => {
+      ctx.fillStyle = '#fafaf6'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = '#1c1a17';
+      for(const p of positions){
+        ctx.beginPath(); ctx.arc(p.x, p.y, dotR, 0, 2*Math.PI); ctx.fill();
+      }
+    };
+    const drawMask = () => {
+      ctx.fillStyle = '#fafaf6'; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = '#1c1a17';
+      for(let i=0;i<70;i++){
+        ctx.beginPath();
+        ctx.arc(Math.random()*W, Math.random()*H,
+                dotR*0.7 + Math.random()*4, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    };
+
+    drawFixation();
+    setTimeout(()=>{
+      drawDots();
+      setTimeout(()=>{
+        drawMask();
+        setTimeout(()=>{
+          const offset = performance.now();
+          display_element.innerHTML =
+            '<div style="text-align:center;padding:30px">' +
+            '<p style="font-size:18px;margin-bottom:18px">How many dots did you see?</p>' +
+            '<input id="enum-input" class="digit-input" type="text" autocomplete="off" inputmode="numeric" autofocus>' +
+            '<p class="muted" style="margin-top:14px;font-size:13px">Type and press <span class="kbd">ENTER</span>.</p>' +
+            '</div>';
+          const input = document.getElementById('enum-input');
+          input.focus();
+          const onKey = (e) => {
+            if(e.code !== 'Enter') return;
+            const resp = parseInt(input.value, 10);
+            if(isNaN(resp)) return;
+            document.removeEventListener('keydown', onKey);
+            this.jsPsych.finishTrial({
+              n_dots: N, response: resp,
+              correct: resp === N, error: resp - N,
+              rt_ms: performance.now() - offset
+            });
+          };
+          document.addEventListener('keydown', onKey);
+        }, 250);
+      }, 200);   // v4: bumped from 150 to 200 ms for browser-timing robustness
+    }, 700);
+  }
+}
+EnumerationPlugin.info = {
+  name: 'enumeration', version: '3.0.0',
+  parameters: { n_dots: { type: 'INT', default: 3 } }, data: {}
+};
+
+
+class DigitSpanPlugin {
+  constructor(jsPsych){ this.jsPsych = jsPsych; }
+  trial(display_element, trial){
+    const len = trial.span_length;
+    const seq = [];
+    for(let i=0;i<len;i++) seq.push(Math.floor(Math.random()*10));
+
+    display_element.innerHTML = '<div class="digit-display" id="ds-stage">+</div>';
+    const stage = document.getElementById('ds-stage');
+
+    let i = 0;
+    const showNext = () => {
+      if(i >= seq.length){
+        display_element.innerHTML =
+          '<div style="text-align:center;padding:30px">' +
+          '<p style="font-size:18px;margin-bottom:18px">Type the digits in <strong>reverse</strong> order.</p>' +
+          '<input id="ds-input" class="digit-input" type="text" autocomplete="off" inputmode="numeric" autofocus>' +
+          '<p class="muted" style="margin-top:14px;font-size:13px">Press <span class="kbd">ENTER</span> to submit.</p>' +
+          '</div>';
+        const input = document.getElementById('ds-input');
+        input.focus();
+        const onKey = (e) => {
+          if(e.code !== 'Enter') return;
+          const respArr = input.value.replace(/\s+/g,'').split('').map(c=>parseInt(c,10)).filter(n=>!isNaN(n));
+          const correctArr = [...seq].reverse();
+          const correct = respArr.length === correctArr.length &&
+                          respArr.every((d, idx) => d === correctArr[idx]);
+          document.removeEventListener('keydown', onKey);
+          this.jsPsych.finishTrial({
+            span_length: len, sequence: seq, response: respArr, correct
+          });
+        };
+        document.addEventListener('keydown', onKey);
+        return;
+      }
+      stage.textContent = seq[i];
+      i++;
+      setTimeout(()=>{
+        stage.textContent = '';
+        setTimeout(showNext, 400);
+      }, 800);
+    };
+    setTimeout(showNext, 800);
+  }
+}
+DigitSpanPlugin.info = {
+  name: 'digit-span', version: '3.0.0',
+  parameters: { span_length: { type: 'INT', default: 4 } }, data: {}
+};
+
+
+/* =========================================================================
+ * PART 2 — Stimuli
+ * ========================================================================= */
+
+const EN_ITEMS = [
+  { id:'en01', adj:'big', noun:'bears', frame:'The hunter spotted [DP] in the forest yesterday.', comp_q:'Was the hunter in a forest?', ans:'Yes' },
+  { id:'en02', adj:'old', noun:'books', frame:'The librarian sorted [DP] on the desk in the afternoon.', comp_q:'Did the librarian sort the books?', ans:'Yes' },
+  { id:'en03', adj:'fresh', noun:'tomatoes', frame:'The chef bought [DP] at the market this morning.', comp_q:'Did the chef visit a market?', ans:'Yes' },
+  { id:'en04', adj:'long', noun:'essays', frame:'The teacher graded [DP] in the office until very late.', comp_q:'Was the teacher at home?', ans:'No' },
+  { id:'en05', adj:'thick', noun:'planks', frame:'The carpenter cut [DP] for the project before lunch.', comp_q:'Did the carpenter cut planks?', ans:'Yes' },
+  { id:'en06', adj:'tall', noun:'sunflowers', frame:'The gardener planted [DP] along the fence yesterday.', comp_q:'Were the sunflowers small?', ans:'No' },
+  { id:'en07', adj:'broken', noun:'engines', frame:'The mechanic fixed [DP] in the garage on Tuesday morning.', comp_q:'Did the mechanic break the engines?', ans:'No' },
+  { id:'en08', adj:'bright', noun:'portraits', frame:'The artist painted [DP] for the gallery show last week.', comp_q:'Were the portraits dark?', ans:'No' },
+  { id:'en09', adj:'haunting', noun:'melodies', frame:'The pianist played [DP] at the concert hall on Friday.', comp_q:'Did the pianist play melodies?', ans:'Yes' },
+  { id:'en10', adj:'colourful', noun:'fish', frame:'The diver photographed [DP] near the reef in the morning.', comp_q:'Was the diver near a reef?', ans:'Yes' },
+  { id:'en11', adj:'round', noun:'cakes', frame:'The baker decorated [DP] for the wedding the next day.', comp_q:'Were the cakes for a wedding?', ans:'Yes' },
+  { id:'en12', adj:'modern', noun:'houses', frame:'The architect designed [DP] for the new suburb last year.', comp_q:'Was the suburb very old?', ans:'No' },
+  { id:'en13', adj:'rusty', noun:'keys', frame:'The locksmith examined [DP] on the workbench after lunch.', comp_q:'Did the locksmith examine keys?', ans:'Yes' },
+  { id:'en14', adj:'sharp', noun:'knives', frame:'The cook sharpened [DP] in the kitchen before dinner.', comp_q:'Was the cook in a library?', ans:'No' },
+  { id:'en15', adj:'heavy', noun:'crates', frame:'The porter loaded [DP] onto the train at dawn.', comp_q:'Did the porter unload the crates?', ans:'No' },
+  { id:'en16', adj:'wooden', noun:'chairs', frame:'The carpenter polished [DP] in the workshop until evening.', comp_q:'Did the carpenter polish chairs?', ans:'Yes' },
+  { id:'en17', adj:'smudged', noun:'mirrors', frame:'The cleaner discarded [DP] behind the building on Monday.', comp_q:'Were the mirrors spotless?', ans:'No' },
+  { id:'en18', adj:'green', noun:'apples', frame:'The grocer arranged [DP] on the shelf this afternoon.', comp_q:'Did the grocer arrange apples?', ans:'Yes' },
+  { id:'en19', adj:'silent', noun:'monks', frame:'The pilgrim greeted [DP] at the temple gate at sunrise.', comp_q:'Were the monks talkative?', ans:'No' },
+  { id:'en20', adj:'small', noun:'cottages', frame:'The estate agent listed [DP] in the brochure that morning.', comp_q:'Did the estate agent list cottages?', ans:'Yes' },
+  { id:'en21', adj:'noisy', noun:'parrots', frame:'The visitor heard [DP] in the courtyard around noon.', comp_q:'Were the parrots quiet?', ans:'No' },
+  { id:'en22', adj:'soft', noun:'pillows', frame:'The maid arranged [DP] on the bed after breakfast.', comp_q:'Did the maid arrange pillows?', ans:'Yes' },
+  { id:'en23', adj:'plain', noun:'envelopes', frame:'The clerk addressed [DP] at the desk before the deadline.', comp_q:'Was the clerk at the beach?', ans:'No' },
+  { id:'en24', adj:'shattered', noun:'windows', frame:'The repairman replaced [DP] in the warehouse last weekend.', comp_q:'Did the repairman replace windows?', ans:'Yes' },
+  { id:'en25', adj:'spicy', noun:'sausages', frame:'The vendor sold [DP] at the festival on Saturday evening.', comp_q:'Was the vendor at a library?', ans:'No' },
+  { id:'en26', adj:'dusty', noun:'paintings', frame:'The curator cleaned [DP] in the storage room yesterday.', comp_q:'Did the curator clean paintings?', ans:'Yes' },
+  { id:'en27', adj:'wide', noun:'rivers', frame:'The cartographer mapped [DP] across the region during summer.', comp_q:'Did the cartographer map rivers?', ans:'Yes' },
+  { id:'en28', adj:'pale', noun:'roses', frame:'The florist wrapped [DP] for the customer at noon.', comp_q:'Were the roses bright red?', ans:'No' },
+  { id:'en29', adj:'wet', noun:'umbrellas', frame:'The waiter collected [DP] near the entrance after the storm.', comp_q:'Did the waiter collect umbrellas?', ans:'Yes' },
+  { id:'en30', adj:'tame', noun:'rabbits', frame:'The handler fed [DP] in the enclosure each morning.', comp_q:'Were the rabbits wild?', ans:'No' },
+  { id:'en31', adj:'sleek', noun:'laptops', frame:'The technician configured [DP] in the office before lunch.', comp_q:'Did the technician break the laptops?', ans:'No' },
+  { id:'en32', adj:'dirty', noun:'plates', frame:'The waiter stacked [DP] on the counter after the meal.', comp_q:'Did the waiter stack plates?', ans:'Yes' },
+  { id:'en33', adj:'curved', noun:'swords', frame:'The blacksmith forged [DP] in the foundry over weeks.', comp_q:'Did the blacksmith forge swords?', ans:'Yes' },
+  { id:'en34', adj:'crisp', noun:'pancakes', frame:'The cook flipped [DP] on the griddle just before serving.', comp_q:'Were the pancakes soggy?', ans:'No' },
+  { id:'en35', adj:'shiny', noun:'medals', frame:'The athlete polished [DP] in the bedroom on Sunday.', comp_q:'Did the athlete polish medals?', ans:'Yes' },
+  { id:'en36', adj:'leather', noun:'wallets', frame:'The thief discarded [DP] near the alley after midnight.', comp_q:'Was the thief on the rooftop?', ans:'No' },
+  { id:'en37', adj:'fragile', noun:'vases', frame:'The mover packed [DP] in foam before the long journey.', comp_q:'Did the mover pack vases?', ans:'Yes' },
+  { id:'en38', adj:'damp', noun:'towels', frame:'The attendant collected [DP] from the poolside in the evening.', comp_q:'Were the towels completely dry?', ans:'No' },
+  { id:'en39', adj:'pink', noun:'balloons', frame:'The clown released [DP] at the circus during the show.', comp_q:'Did the clown release balloons?', ans:'Yes' },
+  { id:'en40', adj:'narrow', noun:'corridors', frame:'The inspector measured [DP] in the basement yesterday.', comp_q:'Was the inspector on the roof?', ans:'No' },
+  { id:'en41', adj:'golden', noun:'trophies', frame:'The committee awarded [DP] at the ceremony last night.', comp_q:'Did the committee award trophies?', ans:'Yes' },
+  { id:'en42', adj:'cold', noun:'sandwiches', frame:'The intern delivered [DP] to the meeting room at noon.', comp_q:'Were the sandwiches hot?', ans:'No' },
+  { id:'en43', adj:'sturdy', noun:'tables', frame:'The mover lifted [DP] into the truck after breakfast.', comp_q:'Did the mover lift tables?', ans:'Yes' },
+  { id:'en44', adj:'foreign', noun:'coins', frame:'The collector catalogued [DP] in the study throughout April.', comp_q:'Did the collector destroy the coins?', ans:'No' },
+  { id:'en45', adj:'creaky', noun:'doors', frame:'The repairman oiled [DP] in the old hotel that morning.', comp_q:'Did the repairman oil doors?', ans:'Yes' },
+  { id:'en46', adj:'plump', noun:'pigeons', frame:'The child watched [DP] in the park during the picnic.', comp_q:'Was the child in a submarine?', ans:'No' },
+  { id:'en47', adj:'flat', noun:'stones', frame:'The hiker collected [DP] along the riverbank yesterday afternoon.', comp_q:'Did the hiker collect stones?', ans:'Yes' },
+  { id:'en48', adj:'glossy', noun:'magazines', frame:'The receptionist arranged [DP] on the table before the guests arrived.', comp_q:'Was the receptionist asleep?', ans:'No' },
+  { id:'en49', adj:'quiet', noun:'libraries', frame:'The traveller visited [DP] across the city over the weekend.', comp_q:'Did the traveller visit libraries?', ans:'Yes' },
+  { id:'en50', adj:'rough', noun:'ropes', frame:'The sailor inspected [DP] on the deck before the voyage.', comp_q:'Were the ropes silky smooth?', ans:'No' },
+  { id:'en51', adj:'simple', noun:'maps', frame:'The instructor distributed [DP] in the classroom that morning.', comp_q:'Did the instructor distribute maps?', ans:'Yes' },
+  { id:'en52', adj:'tangled', noun:'wires', frame:'The electrician separated [DP] in the basement before dinner.', comp_q:'Was the electrician on holiday?', ans:'No' },
+  { id:'en53', adj:'thin', noun:'crepes', frame:'The grandmother served [DP] at breakfast on Sunday.', comp_q:'Did the grandmother serve crepes?', ans:'Yes' },
+  { id:'en54', adj:'frosty', noun:'mugs', frame:'The bartender filled [DP] behind the counter at midnight.', comp_q:'Was the bar empty?', ans:'No' },
+  { id:'en55', adj:'metal', noun:'buckets', frame:'The cleaner carried [DP] into the courtyard at dawn.', comp_q:'Did the cleaner carry buckets?', ans:'Yes' },
+  { id:'en56', adj:'twisted', noun:'branches', frame:'The gardener pruned [DP] in the orchard last Saturday.', comp_q:'Was the gardener inside the house?', ans:'No' },
+  { id:'en57', adj:'flaky', noun:'pastries', frame:'The baker boxed [DP] for the café before opening time.', comp_q:'Did the baker box pastries?', ans:'Yes' },
+  { id:'en58', adj:'cracked', noun:'tiles', frame:'The contractor replaced [DP] on the patio over two days.', comp_q:'Were the tiles brand new?', ans:'No' },
+  { id:'en59', adj:'antique', noun:'clocks', frame:'The dealer appraised [DP] in the shop on Wednesday morning.', comp_q:'Were the clocks recently manufactured?', ans:'No' },
+  { id:'en60', adj:'wild', noun:'horses', frame:'The rancher photographed [DP] across the prairie at sunrise.', comp_q:'Were the horses fully domesticated?', ans:'No' },
+];
+
+const BN_ITEMS = [
+  { id:'bn01', adj:'বড়', noun:'ভাল্লুক', classifier:'টে', frame:'শিকারী জঙ্গলে [DP] দেখেছিল গতকাল।', comp_q:'শিকারী কি জঙ্গলে ছিল?', ans:'হ্যাঁ' },
+  { id:'bn02', adj:'পুরনো', noun:'বই', classifier:'টি', frame:'গ্রন্থাগারিক টেবিলে [DP] গুছিয়েছিল কাল বিকেলে।', comp_q:'গ্রন্থাগারিক কি বই গুছিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn03', adj:'তাজা', noun:'টমেটো', classifier:'টা', frame:'রাঁধুনি বাজার থেকে [DP] কিনেছিল সকালে।', comp_q:'রাঁধুনি কি বাজারে গিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn04', adj:'দীর্ঘ', noun:'প্রবন্ধ', classifier:'টি', frame:'শিক্ষক অফিসে [DP] দেরি পর্যন্ত মূল্যায়ন করেছিলেন।', comp_q:'শিক্ষক কি বাড়িতে ছিলেন?', ans:'না' },
+  { id:'bn05', adj:'মোটা', noun:'তক্তা', classifier:'টা', frame:'মিস্ত্রি দুপুরের আগে [DP] কেটেছিল।', comp_q:'মিস্ত্রি কি তক্তা কেটেছিল?', ans:'হ্যাঁ' },
+  { id:'bn06', adj:'লম্বা', noun:'সূর্যমুখী', classifier:'টা', frame:'মালি বেড়ার ধারে [DP] লাগিয়েছিল গতকাল।', comp_q:'সূর্যমুখী কি ছোট ছিল?', ans:'না' },
+  { id:'bn07', adj:'নষ্ট', noun:'ইঞ্জিন', classifier:'টি', frame:'মেকানিক গ্যারেজে [DP] মঙ্গলবার সারিয়েছিল।', comp_q:'মেকানিক কি ইঞ্জিন ভেঙেছিল?', ans:'না' },
+  { id:'bn08', adj:'উজ্জ্বল', noun:'প্রতিকৃতি', classifier:'টি', frame:'শিল্পী প্রদর্শনীর জন্য [DP] গতসপ্তাহে এঁকেছিল।', comp_q:'প্রতিকৃতি কি অন্ধকার ছিল?', ans:'না' },
+  { id:'bn09', adj:'মধুর', noun:'সুর', classifier:'টি', frame:'বাদ্যকার মঞ্চে শুক্রবার [DP] বাজিয়েছিল।', comp_q:'বাদ্যকার কি সুর বাজিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn10', adj:'রঙিন', noun:'মাছ', classifier:'টা', frame:'ডুবুরি প্রবালপ্রাচীরের কাছে [DP] সকালে ছবি তুলেছিল।', comp_q:'ডুবুরি কি প্রবালপ্রাচীরের কাছে ছিল?', ans:'হ্যাঁ' },
+  { id:'bn11', adj:'গোল', noun:'কেক', classifier:'টা', frame:'পাচক বিয়ের জন্য [DP] পরদিন সাজিয়েছিল।', comp_q:'কেক কি বিয়ের জন্য ছিল?', ans:'হ্যাঁ' },
+  { id:'bn12', adj:'আধুনিক', noun:'বাড়ি', classifier:'টি', frame:'স্থপতি নতুন উপশহরের জন্য গতবছর [DP] নকশা করেছিল।', comp_q:'উপশহর কি খুব পুরনো ছিল?', ans:'না' },
+  { id:'bn13', adj:'মরচে-ধরা', noun:'চাবি', classifier:'টা', frame:'তালা-প্রস্তুতকারক দুপুরের পর কর্মশালায় [DP] পরীক্ষা করেছিল।', comp_q:'তালা-প্রস্তুতকারক কি চাবি পরীক্ষা করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn14', adj:'ধারালো', noun:'ছুরি', classifier:'টা', frame:'রাঁধুনি রাতের আগে রান্নাঘরে [DP] শান দিয়েছিল।', comp_q:'রাঁধুনি কি গ্রন্থাগারে ছিল?', ans:'না' },
+  { id:'bn15', adj:'ভারী', noun:'বাক্স', classifier:'টা', frame:'কুলি ভোরে ট্রেনে [DP] তুলেছিল।', comp_q:'কুলি কি বাক্স নামিয়েছিল?', ans:'না' },
+  { id:'bn16', adj:'কাঠের', noun:'চেয়ার', classifier:'টা', frame:'মিস্ত্রি কর্মশালায় সন্ধ্যা পর্যন্ত [DP] পালিশ করেছিল।', comp_q:'মিস্ত্রি কি চেয়ার পালিশ করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn17', adj:'ময়লা', noun:'আয়না', classifier:'টা', frame:'পরিচ্ছন্নতাকর্মী সোমবার ভবনের পিছনে [DP] ফেলে দিয়েছিল।', comp_q:'আয়না কি ঝকঝকে ছিল?', ans:'না' },
+  { id:'bn18', adj:'সবুজ', noun:'আপেল', classifier:'টা', frame:'মুদি দুপুরে তাকে [DP] সাজিয়েছিল।', comp_q:'মুদি কি আপেল সাজিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn19', adj:'নীরব', noun:'সন্ন্যাসী', classifier:'টি', frame:'তীর্থযাত্রী সূর্যোদয়ে মন্দিরের দ্বারে [DP] অভিবাদন জানিয়েছিল।', comp_q:'সন্ন্যাসীরা কি কথা বলছিলেন?', ans:'না' },
+  { id:'bn20', adj:'ছোট', noun:'কুটির', classifier:'টি', frame:'সম্পত্তি-এজেন্ট সেই সকালে বিজ্ঞাপনে [DP] তালিকাভুক্ত করেছিল।', comp_q:'সম্পত্তি-এজেন্ট কি কুটির তালিকাভুক্ত করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn21', adj:'কোলাহলপূর্ণ', noun:'টিয়া', classifier:'টা', frame:'দর্শক দুপুরবেলায় উঠোনে [DP] শুনেছিল।', comp_q:'টিয়াগুলি কি চুপচাপ ছিল?', ans:'না' },
+  { id:'bn22', adj:'নরম', noun:'বালিশ', classifier:'টা', frame:'পরিচারিকা প্রাতরাশের পরে বিছানায় [DP] সাজিয়েছিল।', comp_q:'পরিচারিকা কি বালিশ সাজিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn23', adj:'সাদাসিধে', noun:'খাম', classifier:'টা', frame:'কেরানি সময়সীমার আগে ডেস্কে [DP] ঠিকানা লিখেছিল।', comp_q:'কেরানি কি সৈকতে ছিল?', ans:'না' },
+  { id:'bn24', adj:'ভাঙা', noun:'জানালা', classifier:'টা', frame:'মেরামতকারী গত সপ্তাহে গুদামে [DP] বদলে দিয়েছিল।', comp_q:'মেরামতকারী কি জানালা বদলেছিল?', ans:'হ্যাঁ' },
+  { id:'bn25', adj:'ঝাল', noun:'সসেজ', classifier:'টা', frame:'বিক্রেতা শনিবার সন্ধ্যায় উৎসবে [DP] বিক্রি করেছিল।', comp_q:'বিক্রেতা কি গ্রন্থাগারে ছিল?', ans:'না' },
+  { id:'bn26', adj:'ধুলোমাখা', noun:'চিত্রকর্ম', classifier:'টি', frame:'কিউরেটর গতকাল ভাণ্ডার-ঘরে [DP] পরিষ্কার করেছিল।', comp_q:'কিউরেটর কি চিত্রকর্ম পরিষ্কার করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn27', adj:'চওড়া', noun:'নদী', classifier:'টি', frame:'মানচিত্রকার গ্রীষ্মে অঞ্চল জুড়ে [DP] মানচিত্রে এঁকেছিল।', comp_q:'মানচিত্রকার কি নদী আঁকেছিল?', ans:'হ্যাঁ' },
+  { id:'bn28', adj:'ফ্যাকাশে', noun:'গোলাপ', classifier:'টা', frame:'ফুলবিক্রেতা দুপুরে গ্রাহকের জন্য [DP] মুড়ে দিয়েছিল।', comp_q:'গোলাপ কি টকটকে লাল ছিল?', ans:'না' },
+  { id:'bn29', adj:'ভেজা', noun:'ছাতা', classifier:'টা', frame:'বেয়ারা ঝড়ের পরে দরজার কাছে [DP] সংগ্রহ করেছিল।', comp_q:'বেয়ারা কি ছাতা সংগ্রহ করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn30', adj:'পোষা', noun:'খরগোশ', classifier:'টা', frame:'যত্নকারী প্রতি সকালে খাঁচায় [DP] খাইয়েছিল।', comp_q:'খরগোশগুলি কি বুনো ছিল?', ans:'না' },
+  { id:'bn31', adj:'মসৃণ', noun:'ল্যাপটপ', classifier:'টি', frame:'প্রযুক্তিবিদ দুপুরের আগে অফিসে [DP] কনফিগার করেছিল।', comp_q:'প্রযুক্তিবিদ কি ল্যাপটপ ভেঙেছিল?', ans:'না' },
+  { id:'bn32', adj:'নোংরা', noun:'প্লেট', classifier:'টা', frame:'বেয়ারা খাওয়ার পরে কাউন্টারে [DP] স্তূপ করেছিল।', comp_q:'বেয়ারা কি প্লেট স্তূপ করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn33', adj:'বাঁকা', noun:'তরোয়াল', classifier:'টি', frame:'কামার সপ্তাহ ধরে কারখানায় [DP] তৈরি করেছিল।', comp_q:'কামার কি তরোয়াল তৈরি করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn34', adj:'মুচমুচে', noun:'প্যানকেক', classifier:'টা', frame:'রাঁধুনি পরিবেশনের ঠিক আগে চুলায় [DP] উল্টে দিয়েছিল।', comp_q:'প্যানকেক কি নরম ছিল?', ans:'না' },
+  { id:'bn35', adj:'ঝকঝকে', noun:'পদক', classifier:'টি', frame:'খেলোয়াড় রবিবার শোবার ঘরে [DP] পালিশ করেছিল।', comp_q:'খেলোয়াড় কি পদক পালিশ করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn36', adj:'চামড়ার', noun:'মানিব্যাগ', classifier:'টা', frame:'চোর মাঝরাতে গলির কাছে [DP] ফেলে দিয়েছিল।', comp_q:'চোর কি ছাদে ছিল?', ans:'না' },
+  { id:'bn37', adj:'নাজুক', noun:'ফুলদানি', classifier:'টি', frame:'মালপত্রবাহক দীর্ঘ যাত্রার আগে ফোমে [DP] মুড়ে দিয়েছিল।', comp_q:'মালপত্রবাহক কি ফুলদানি মুড়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn38', adj:'স্যাঁতসেঁতে', noun:'গামছা', classifier:'টা', frame:'পরিচারক সন্ধ্যায় পুলের পাশ থেকে [DP] সংগ্রহ করেছিল।', comp_q:'গামছা কি একেবারে শুকনো ছিল?', ans:'না' },
+  { id:'bn39', adj:'গোলাপি', noun:'বেলুন', classifier:'টা', frame:'ভাঁড় অনুষ্ঠানের সময় সার্কাসে [DP] ছেড়ে দিয়েছিল।', comp_q:'ভাঁড় কি বেলুন ছেড়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn40', adj:'সরু', noun:'করিডোর', classifier:'টি', frame:'পরিদর্শক গতকাল বেসমেন্টে [DP] মেপেছিল।', comp_q:'পরিদর্শক কি ছাদে ছিল?', ans:'না' },
+  { id:'bn41', adj:'সোনালি', noun:'ট্রফি', classifier:'টি', frame:'কমিটি গতরাতে অনুষ্ঠানে [DP] পুরস্কার দিয়েছিল।', comp_q:'কমিটি কি ট্রফি দিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn42', adj:'ঠান্ডা', noun:'স্যান্ডউইচ', classifier:'টা', frame:'শিক্ষানবিশ দুপুরে সভাকক্ষে [DP] পৌঁছে দিয়েছিল।', comp_q:'স্যান্ডউইচ কি গরম ছিল?', ans:'না' },
+  { id:'bn43', adj:'শক্তপোক্ত', noun:'টেবিল', classifier:'টা', frame:'মালপত্রবাহক প্রাতরাশের পরে ট্রাকে [DP] তুলেছিল।', comp_q:'মালপত্রবাহক কি টেবিল তুলেছিল?', ans:'হ্যাঁ' },
+  { id:'bn44', adj:'বিদেশি', noun:'মুদ্রা', classifier:'টি', frame:'সংগ্রাহক এপ্রিল মাস জুড়ে অধ্যয়নকক্ষে [DP] তালিকাভুক্ত করেছিল।', comp_q:'সংগ্রাহক কি মুদ্রা নষ্ট করেছিল?', ans:'না' },
+  { id:'bn45', adj:'ক্যাঁচক্যাঁচে', noun:'দরজা', classifier:'টা', frame:'মেরামতকারী সেই সকালে পুরনো হোটেলে [DP] তেল দিয়েছিল।', comp_q:'মেরামতকারী কি দরজায় তেল দিয়েছিল?', ans:'হ্যাঁ' },
+  { id:'bn46', adj:'মোটাসোটা', noun:'পায়রা', classifier:'টা', frame:'শিশু পিকনিকের সময় উদ্যানে [DP] দেখেছিল।', comp_q:'শিশু কি ডুবোজাহাজে ছিল?', ans:'না' },
+  { id:'bn47', adj:'চ্যাপ্টা', noun:'পাথর', classifier:'টা', frame:'পথিক গতকাল বিকেলে নদীতীরে [DP] সংগ্রহ করেছিল।', comp_q:'পথিক কি পাথর সংগ্রহ করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn48', adj:'চকচকে', noun:'পত্রিকা', classifier:'টি', frame:'অভ্যর্থনাকারী অতিথি আসার আগে টেবিলে [DP] সাজিয়েছিল।', comp_q:'অভ্যর্থনাকারী কি ঘুমাচ্ছিল?', ans:'না' },
+  { id:'bn49', adj:'শান্ত', noun:'গ্রন্থাগার', classifier:'টি', frame:'পর্যটক সপ্তাহান্তে সারা শহরে [DP] পরিদর্শন করেছিল।', comp_q:'পর্যটক কি গ্রন্থাগার পরিদর্শন করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn50', adj:'খসখসে', noun:'দড়ি', classifier:'টা', frame:'নাবিক যাত্রার আগে ডেকে [DP] পরীক্ষা করেছিল।', comp_q:'দড়ি কি রেশমের মতো মসৃণ ছিল?', ans:'না' },
+  { id:'bn51', adj:'সাধারণ', noun:'মানচিত্র', classifier:'টি', frame:'প্রশিক্ষক সেই সকালে শ্রেণীকক্ষে [DP] বিতরণ করেছিল।', comp_q:'প্রশিক্ষক কি মানচিত্র বিতরণ করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn52', adj:'জট-পাকানো', noun:'তার', classifier:'টা', frame:'বিদ্যুতমিস্ত্রি রাতের খাবারের আগে বেসমেন্টে [DP] আলাদা করেছিল।', comp_q:'বিদ্যুতমিস্ত্রি কি ছুটিতে ছিল?', ans:'না' },
+  { id:'bn53', adj:'পাতলা', noun:'ক্রেপ', classifier:'টা', frame:'দিদিমা রবিবার প্রাতরাশে [DP] পরিবেশন করেছিল।', comp_q:'দিদিমা কি ক্রেপ পরিবেশন করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn54', adj:'বরফ-শীতল', noun:'মগ', classifier:'টা', frame:'বারটেন্ডার মাঝরাতে কাউন্টারের পিছনে [DP] ভরেছিল।', comp_q:'বার কি ফাঁকা ছিল?', ans:'না' },
+  { id:'bn55', adj:'ধাতব', noun:'বালতি', classifier:'টা', frame:'পরিচ্ছন্নতাকর্মী ভোরে উঠোনে [DP] বহন করেছিল।', comp_q:'পরিচ্ছন্নতাকর্মী কি বালতি বহন করেছিল?', ans:'হ্যাঁ' },
+  { id:'bn56', adj:'বাঁকানো', noun:'ডাল', classifier:'টা', frame:'মালি গত শনিবার বাগানে [DP] ছেঁটেছিল।', comp_q:'মালি কি বাড়ির ভিতরে ছিল?', ans:'না' },
+  { id:'bn57', adj:'খাস্তা', noun:'পেস্ট্রি', classifier:'টি', frame:'রুটিওয়ালা খোলার আগে ক্যাফের জন্য [DP] বাক্সে ভরেছিল।', comp_q:'রুটিওয়ালা কি পেস্ট্রি বাক্সে ভরেছিল?', ans:'হ্যাঁ' },
+  { id:'bn58', adj:'ফাটা', noun:'টালি', classifier:'টা', frame:'ঠিকাদার দুদিন ধরে বারান্দায় [DP] বদলে দিয়েছিল।', comp_q:'টালি কি একদম নতুন ছিল?', ans:'না' },
+  { id:'bn59', adj:'প্রাচীন', noun:'ঘড়ি', classifier:'টি', frame:'ব্যবসায়ী বুধবার সকালে দোকানে [DP] মূল্যায়ন করেছিল।', comp_q:'ঘড়ি কি সম্প্রতি বানানো হয়েছিল?', ans:'না' },
+  { id:'bn60', adj:'বুনো', noun:'ঘোড়া', classifier:'টা', frame:'খামারের মালিক সূর্যোদয়ে প্রান্তরজুড়ে [DP] ছবি তুলেছিল।', comp_q:'ঘোড়াগুলি কি পুরোপুরি পোষা ছিল?', ans:'না' },
+];
+
+const EN_FILLERS = [
+  'The committee met on Thursday to discuss the new policy.',
+  'The pilot landed the aircraft safely despite the heavy storm.',
+  'The professor explained the theorem with surprising clarity.',
+  'The diplomat returned from the conference late on Sunday.',
+  'The musician practised the difficult passage for several hours.',
+  'The auditor reviewed the accounts before the deadline arrived.',
+  'The journalist interviewed the mayor about the recent decision.',
+  'The architect submitted the proposal before the meeting started.',
+  'The novelist completed the manuscript after months of revisions.',
+  'The detective questioned the witness near the railway station.',
+  'The teacher distributed the worksheets at the start of class.',
+  'The biologist observed the migration pattern during early spring.',
+  'The historian published the article in a respected journal.',
+  'The accountant filed the documents shortly before the audit.',
+  'The engineer designed the bridge after consulting several experts.',
+  'The chef prepared the banquet over the course of two days.',
+  'The artist exhibited the sculpture at the new downtown gallery.',
+  'The lawyer drafted the contract during the afternoon meeting.',
+  'The athlete trained on the track every morning before sunrise.',
+  'The director cast the actor for the leading role yesterday.',
+  'The scientist published the findings in a peer-reviewed journal.',
+  'The volunteer assisted the elderly residents at the community centre.',
+  'The pharmacist dispensed the medication carefully and politely.',
+  'The receptionist transferred the call to the senior manager immediately.',
+  'The waiter served the dessert after clearing the main course.',
+  'The student submitted the dissertation just before the deadline.',
+  'The composer revised the symphony before the rehearsal began.',
+  'The translator finalised the document late on Friday evening.',
+  'The publisher accepted the manuscript after a long deliberation.',
+  'The mechanic diagnosed the problem within the first hour.',
+  'The geologist studied the rock formations along the coastal cliffs.',
+  'The astronomer recorded the observations throughout the long night.',
+  'The cartographer updated the chart after the new survey.',
+  'The biologist labelled the specimens before the experiment began.',
+  'The teacher dismissed the class earlier than usual on Wednesday.',
+  'The driver navigated the truck through the winding mountain road.',
+  'The carpenter completed the cabinet after working overtime for days.',
+  'The nurse administered the vaccine to the patients without delay.',
+  'The librarian catalogued the new arrivals during the quiet afternoon.',
+  'The conductor led the orchestra through the final movement gracefully.',
+  'The painter finished the mural just as the sun was setting.',
+  'The diplomat negotiated the treaty over several lengthy sessions.',
+  'The economist predicted the recession in a controversial report.',
+  'The professor delivered the lecture to a packed auditorium.',
+  'The detective solved the case despite the lack of clear evidence.',
+  'The veterinarian treated the injured stray with great patience.',
+  'The author signed the books at the bookstore on Saturday.',
+  'The doctor examined the patient thoroughly during the morning rounds.',
+  'The barber trimmed the beard with practised and steady hands.',
+  'The runner finished the race despite a slight ankle injury.',
+  'The director rejected the script after the second reading.',
+  'The principal addressed the assembly with unexpected warmth.',
+  'The mechanic returned the keys to the owner with a smile.',
+  'The hiker reached the summit just before the sun went down.',
+  'The cashier counted the change before handing it back.',
+  'The musician tuned the instrument carefully before the concert began.',
+  'The poet recited the verses with quiet and measured intensity.',
+  'The gardener watered the lawn early before the heat set in.',
+  'The captain ordered the crew to prepare for the long voyage.',
+  'The professor reviewed the manuscript before submitting it for publication.',
+];
+
+const BN_FILLERS = [
+  'কমিটি বৃহস্পতিবার নতুন নীতি নিয়ে আলোচনা করেছিল।',
+  'পাইলট ভারী ঝড়ের মধ্যেও বিমানটি নিরাপদে অবতরণ করেছিল।',
+  'অধ্যাপক উপপাদ্যটি আশ্চর্য সরলতার সাথে ব্যাখ্যা করলেন।',
+  'কূটনীতিক সম্মেলন থেকে রবিবার দেরিতে ফিরেছিলেন।',
+  'বাদ্যকার কঠিন অংশটি বহু ঘণ্টা অনুশীলন করেছিল।',
+  'নিরীক্ষক সময়সীমার আগে হিসাবগুলি পর্যালোচনা করেছিলেন।',
+  'সাংবাদিক মেয়রের সাম্প্রতিক সিদ্ধান্ত নিয়ে সাক্ষাৎকার নিয়েছিলেন।',
+  'স্থপতি সভা শুরুর আগে প্রস্তাব জমা দিয়েছিলেন।',
+  'ঔপন্যাসিক মাসের পর মাস সংশোধনের পরে পাণ্ডুলিপি সম্পন্ন করেছিলেন।',
+  'গোয়েন্দা রেল স্টেশনের কাছে সাক্ষীকে জিজ্ঞাসা করেছিলেন।',
+  'শিক্ষক ক্লাসের শুরুতেই ছাত্রদের ওয়ার্কশিট বিতরণ করেছিলেন।',
+  'জীববিজ্ঞানী বসন্তের শুরুতে অভিবাসন প্যাটার্ন পর্যবেক্ষণ করেছিলেন।',
+  'ইতিহাসবিদ একটি সম্মানিত জার্নালে নিবন্ধটি প্রকাশ করেছিলেন।',
+  'হিসাবরক্ষক নিরীক্ষার ঠিক আগেই দলিলগুলি দাখিল করেছিলেন।',
+  'প্রকৌশলী বিশেষজ্ঞদের সাথে পরামর্শ করে সেতুটি নকশা করেছিলেন।',
+  'রাঁধুনি দুদিন ধরে ভোজসভার প্রস্তুতি নিয়েছিলেন।',
+  'শিল্পী ভাস্কর্যটি শহরের নতুন গ্যালারিতে প্রদর্শন করেছিলেন।',
+  'আইনজীবী বিকেলের সভায় চুক্তিটির খসড়া তৈরি করেছিলেন।',
+  'অ্যাথলিট প্রতিদিন সূর্যোদয়ের আগে ট্র্যাকে প্রশিক্ষণ নিয়েছিলেন।',
+  'পরিচালক গতকাল প্রধান চরিত্রের জন্য অভিনেতা নির্বাচন করেছিলেন।',
+  'বিজ্ঞানী পিয়ার-পর্যালোচিত জার্নালে গবেষণার ফল প্রকাশ করেছিলেন।',
+  'স্বেচ্ছাসেবক কমিউনিটি সেন্টারে বয়স্ক বাসিন্দাদের সাহায্য করেছিলেন।',
+  'ওষুধ-বিক্রেতা যত্ন সহকারে ওষুধ বিতরণ করেছিলেন।',
+  'অভ্যর্থনাকারী দ্রুতই কলটি সিনিয়র ম্যানেজারের কাছে স্থানান্তর করেছিলেন।',
+  'বেয়ারা প্রধান খাবার পরিষ্কার করার পরে মিষ্টি পরিবেশন করেছিলেন।',
+  'ছাত্র সময়সীমার ঠিক আগে অভিসন্দর্ভ জমা দিয়েছিল।',
+  'সুরকার মহড়া শুরুর আগে সিম্ফনিটি সংশোধন করেছিলেন।',
+  'অনুবাদক শুক্রবার সন্ধ্যায় দলিলটি চূড়ান্ত করেছিলেন।',
+  'প্রকাশক দীর্ঘ আলোচনার পরে পাণ্ডুলিপিটি গ্রহণ করেছিলেন।',
+  'মেকানিক প্রথম ঘণ্টার মধ্যেই সমস্যা নির্ণয় করেছিলেন।',
+  'ভূতত্ত্ববিদ উপকূলীয় খাড়াইতে পাথরের গঠন অধ্যয়ন করেছিলেন।',
+  'জ্যোতির্বিদ দীর্ঘ রাত জুড়ে পর্যবেক্ষণ লিপিবদ্ধ করেছিলেন।',
+  'মানচিত্রকার নতুন জরিপের পরে চার্ট হালনাগাদ করেছিলেন।',
+  'জীববিজ্ঞানী পরীক্ষা শুরুর আগে নমুনাগুলি লেবেল করেছিলেন।',
+  'শিক্ষক বুধবার স্বাভাবিকের চেয়ে আগেই ক্লাস ছুটি দিয়েছিলেন।',
+  'চালক আঁকাবাঁকা পার্বত্য সড়কে ট্রাকটি চালিয়েছিলেন।',
+  'মিস্ত্রি দিনের পর দিন অতিরিক্ত সময় কাজ করে আলমারিটি সম্পন্ন করেছিলেন।',
+  'নার্স দেরি না করে রোগীদের টিকা দিয়েছিলেন।',
+  'গ্রন্থাগারিক শান্ত দুপুরবেলায় নতুন বই নিবন্ধভুক্ত করেছিলেন।',
+  'পরিচালক অর্কেস্ট্রাকে শেষ আন্দোলনের মধ্য দিয়ে সুন্দরভাবে পরিচালনা করেছিলেন।',
+  'চিত্রশিল্পী সূর্যাস্তের সময় ম্যুরালটি শেষ করেছিলেন।',
+  'কূটনীতিক বহু দীর্ঘ অধিবেশনে চুক্তির বিষয়ে আলোচনা করেছিলেন।',
+  'অর্থনীতিবিদ একটি বিতর্কিত প্রতিবেদনে মন্দার পূর্বাভাস দিয়েছিলেন।',
+  'অধ্যাপক উপচে পড়া অডিটোরিয়ামে বক্তৃতা দিয়েছিলেন।',
+  'গোয়েন্দা স্পষ্ট প্রমাণের অভাব সত্ত্বেও মামলা সমাধান করেছিলেন।',
+  'পশুচিকিৎসক ধৈর্য ধরে আহত পথ-পশুর চিকিৎসা করেছিলেন।',
+  'লেখক শনিবার বইয়ের দোকানে বইগুলিতে স্বাক্ষর করেছিলেন।',
+  'ডাক্তার সকালের রাউন্ডে রোগীকে যত্ন সহকারে পরীক্ষা করেছিলেন।',
+  'নাপিত স্থির হাতে দাড়ি ছেঁটে দিয়েছিলেন।',
+  'দৌড়বিদ গোড়ালির হালকা আঘাতের পরেও দৌড় শেষ করেছিলেন।',
+  'পরিচালক দ্বিতীয় পঠনের পরে চিত্রনাট্যটি প্রত্যাখ্যান করেছিলেন।',
+  'অধ্যক্ষ অপ্রত্যাশিত উষ্ণতার সাথে সভায় ভাষণ দিয়েছিলেন।',
+  'মেকানিক হাসিমুখে মালিকের কাছে চাবি ফিরিয়ে দিয়েছিলেন।',
+  'পথিক সূর্যাস্তের ঠিক আগে শৃঙ্গে পৌঁছেছিলেন।',
+  'ক্যাশিয়ার ফেরত দেওয়ার আগে খুচরো গুনেছিলেন।',
+  'বাদ্যকার অনুষ্ঠানের আগে যত্ন সহকারে যন্ত্রটি সুর করেছিলেন।',
+  'কবি শান্ত পরিমিত গভীরতায় কবিতা আবৃত্তি করেছিলেন।',
+  'মালি গরম পড়ার আগেই ভোরবেলায় লন-এ জল দিয়েছিলেন।',
+  'নাবিক ক্রুদের দীর্ঘ যাত্রার জন্য প্রস্তুত হতে আদেশ দিয়েছিলেন।',
+  'অধ্যাপক প্রকাশনার জন্য জমা দেওয়ার আগে পাণ্ডুলিপি পর্যালোচনা করেছিলেন।',
+];
+
+
+/* =========================================================================
+ * PART 3 — Helpers
+ * ========================================================================= */
+
+function numWordEN(n){
+  return ['','one','two','three','four','five','six','seven','eight','nine','ten'][n] || String(n);
+}
+function numWordBN(n){
+  return ['','এক','দুই','তিন','চার','পাঁচ','ছয়','সাত','আট','নয়','দশ'][n] || String(n);
+}
+
+function buildSentence(item, lang, condition, magnitude){
+  let dp;
+  if(lang === 'en'){
+    if(condition === 'canonical')   dp = numWordEN(magnitude) + ' ' + item.adj + ' ' + item.noun;
+    else                            dp = item.adj + ' ' + numWordEN(magnitude) + ' ' + item.noun;
+  } else {
+    const numcl = numWordBN(magnitude) + '-' + item.classifier;
+    if(condition === 'canonical')                dp = numcl + ' ' + item.adj + ' ' + item.noun;
+    else if(condition === 'reduplicated-inside') dp = numcl + ' ' + item.adj + ' ' + item.adj + ' ' + item.noun;
+    else                                         dp = item.adj + ' ' + item.adj + ' ' + numcl + ' ' + item.noun;
+  }
+  const sentence = item.frame.replace('[DP]', dp);
+  const tokens = sentence.split(/\s+/);
+  const critical_word_index = tokens.findIndex(t => t.includes(item.noun));
+  return { sentence, critical_word_index };
+}
+
+function buildCriticalTrials(items, lang, subjectId){
+  // v4 fix: condition assignment (Latin square) and magnitude assignment are
+  // now INDEPENDENT. v3 used `cond = conditions[(i+parity) % 3]` together with
+  // `mag = magnitudes[i % 6]`, which gave (cond, mag) pairs cycling at
+  // lcm(3,6) = 6 — perfectly confounding condition with magnitude within
+  // each participant. The fix below assigns conditions first, then shuffles
+  // magnitudes independently within each condition's item group.
+  const conditions = (lang === 'en')
+    ? ['canonical','inverted']
+    : ['canonical','reduplicated-inside','reduplicated-outside'];
+  const magnitudes = [2,3,4,6,8,10];
+  const parity = subjectId % conditions.length;
+
+  // Step 1: assign conditions via Latin square (unchanged).
+  const condAssignments = items.map((_, i) => conditions[(i + parity) % conditions.length]);
+
+  // Step 2: for each condition, independently shuffle magnitudes (with
+  // replication if the condition group has more items than magnitudes).
+  const magsPerCond = {};
+  for (const c of conditions) {
+    const nItemsInCond = condAssignments.filter(x => x === c).length;
+    const reps = Math.ceil(nItemsInCond / magnitudes.length);
+    const expanded = [];
+    for (let r = 0; r < reps; r++) expanded.push(...magnitudes);
+    magsPerCond[c] = jsPsych.randomization.shuffle(expanded).slice(0, nItemsInCond);
+  }
+
+  // Step 3: walk items, assigning condition and consuming the next magnitude
+  // from that condition's shuffled list.
+  const magIdx = {};
+  for (const c of conditions) magIdx[c] = 0;
+
+  return items.map((item, i) => {
+    const cond = condAssignments[i];
+    const mag = magsPerCond[cond][magIdx[cond]++];
+    const { sentence, critical_word_index } = buildSentence(item, lang, cond, mag);
+    return {
+      item_id: item.id, sentence, language: lang,
+      condition: cond, magnitude: mag, critical_word_index,
+      comp_q: item.comp_q, comp_ans: item.ans
+    };
+  });
+}
+
+
+/* =========================================================================
+ * PART 4 — Initialisation
+ * ========================================================================= */
+
+const subjectId = DEPLOYMENT_CONFIG.participantId ||
+                  ('s' + Math.floor(Math.random()*1e8));
+let selectedLanguage = null;   // set by language-selection trial's on_finish
+
+// Prevent accidental tab-close mid-session. Disabled at the end of the study.
+let sessionInProgress = false;
+window.addEventListener('beforeunload', (e) => {
+  if (sessionInProgress) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
+
+
+/* -------------------------------------------------------------------------
+ * Data cleaning: strip the bulky stimulus HTML from instruction trials.
+ * This keeps the JSON small (instruction stimuli were ~70% of v3 file size)
+ * while preserving all behavioural data and the comprehension question text.
+ * ------------------------------------------------------------------------- */
+function cleanDataForExport(rawData){
+  return rawData.map(t => {
+    const c = {...t};
+    // Strip stimulus on html-button-response trials that are instruction
+    // screens (identified by large stimulus and no phase tag, OR by phase
+    // 'instruction'). Comprehension questions have short stimuli (under
+    // 300 chars) and a phase ending in '_comp', so they're preserved.
+    if (c.trial_type === 'html-button-response' &&
+        typeof c.stimulus === 'string' &&
+        c.stimulus.length > 300 &&
+        (!c.phase || c.phase === 'instruction')) {
+      c.stimulus_stripped_chars = c.stimulus.length;
+      delete c.stimulus;
+    }
+    // Always strip the fullscreen trial's message field — it's pure chrome.
+    if (c.trial_type === 'fullscreen') {
+      delete c.message;
+    }
+    return c;
+  });
+}
+
+
+/* -------------------------------------------------------------------------
+ * Session analysis: produce a structured summary of the participant's
+ * performance suitable for in-browser display and for downstream review.
+ * Returns a plain object; rendering is separate.
+ * ------------------------------------------------------------------------- */
+function analyseSession(sessionData){
+  const data = sessionData.data;
+  const sid = sessionData.subjectId;
+
+  const stddev = (arr) => {
+    if (arr.length < 2) return 0;
+    const m = arr.reduce((a,b)=>a+b,0)/arr.length;
+    const v = arr.reduce((s,x)=>s+(x-m)*(x-m),0)/(arr.length-1);
+    return Math.sqrt(v);
+  };
+  const formatDuration = (ms) => {
+    const sec = Math.round(ms/1000);
+    const m = Math.floor(sec/60), s = sec % 60;
+    return m + ':' + String(s).padStart(2,'0');
+  };
+
+  // ----- Session header -----
+  const langTrial = data.find(t => t.phase === 'language_choice');
+  const lang = langTrial ? langTrial.language : 'unknown';
+  const langName = lang === 'bn' ? 'Bengali' : (lang === 'en' ? 'English' : 'unknown');
+  const lastTrial = data[data.length - 1] || {};
+  const durationMs = lastTrial.time_elapsed || 0;
+
+  // ----- Demographics -----
+  const demoText = (data.find(t => t.phase === 'demographics_text') || {}).response || {};
+  const demoEdu  = (data.find(t => t.phase === 'demographics_education') || {}).response || {};
+  const demoMC   = (data.find(t => t.phase === 'demographics_mc') || {}).response || {};
+
+  // ----- SPR: critical-word RT by condition × magnitude -----
+  const sprMain = data.filter(t =>
+    (t.phase === 'main_en' || t.phase === 'main_bn') &&
+    t.condition && t.condition !== 'filler' && t.condition !== 'practice'
+  );
+  const cellRTs = {};       // condition -> magnitude -> [rts]
+  const spilloverRTs = {};  // condition -> magnitude -> [rts]
+  const condSet = new Set(), magSet = new Set();
+  for (const t of sprMain) {
+    const cwi = t.critical_word_index;
+    if (cwi === undefined || cwi < 0 || !t.word_rts) continue;
+    const cw = t.word_rts.find(w => w.word_index === cwi);
+    if (!cw) continue;
+    const cond = t.condition, mag = t.magnitude;
+    condSet.add(cond); magSet.add(mag);
+    if (!cellRTs[cond]) cellRTs[cond] = {};
+    if (!cellRTs[cond][mag]) cellRTs[cond][mag] = [];
+    cellRTs[cond][mag].push(cw.rt_ms);
+    // Spillover: critical_word_index + 1, if it exists
+    const sw = t.word_rts.find(w => w.word_index === cwi + 1);
+    if (sw) {
+      if (!spilloverRTs[cond]) spilloverRTs[cond] = {};
+      if (!spilloverRTs[cond][mag]) spilloverRTs[cond][mag] = [];
+      spilloverRTs[cond][mag].push(sw.rt_ms);
+    }
+  }
+  const conditions = [...condSet].sort();
+  const magnitudes = [...magSet].sort((a,b) => a-b);
+  const cellStats = {};
+  let totalCells = 0, filledCells = 0;
+  for (const c of conditions) {
+    cellStats[c] = {};
+    for (const m of magnitudes) {
+      totalCells++;
+      const rts = (cellRTs[c] && cellRTs[c][m]) || [];
+      if (rts.length === 0) {
+        cellStats[c][m] = null;
+      } else {
+        filledCells++;
+        cellStats[c][m] = {
+          mean: rts.reduce((a,b)=>a+b,0)/rts.length,
+          sd: stddev(rts),
+          n: rts.length
+        };
+      }
+    }
+  }
+  // Condition marginal means (collapsing across magnitude)
+  const condMarginal = {};
+  for (const c of conditions) {
+    const all = [];
+    for (const m of magnitudes) {
+      if (cellRTs[c] && cellRTs[c][m]) all.push(...cellRTs[c][m]);
+    }
+    condMarginal[c] = all.length ? {
+      mean: all.reduce((a,b)=>a+b,0)/all.length, sd: stddev(all), n: all.length
+    } : null;
+  }
+  // Magnitude marginal means (collapsing across condition)
+  const magMarginal = {};
+  for (const m of magnitudes) {
+    const all = [];
+    for (const c of conditions) {
+      if (cellRTs[c] && cellRTs[c][m]) all.push(...cellRTs[c][m]);
+    }
+    magMarginal[m] = all.length ? {
+      mean: all.reduce((a,b)=>a+b,0)/all.length, sd: stddev(all), n: all.length
+    } : null;
+  }
+
+  // ----- Comprehension -----
+  const comps = data.filter(t => t.phase && /_comp$/.test(t.phase));
+  const compMain = comps.filter(t => /main.*_comp/.test(t.phase));
+  const compAcc = comps.length ? comps.filter(c => c.correct).length / comps.length : null;
+  const compMainAcc = compMain.length ? compMain.filter(c => c.correct).length / compMain.length : null;
+
+  // ----- MOT -----
+  const motMain = data.filter(t => t.phase === 'mot_main');
+  const motByK = {};
+  for (const t of motMain) {
+    const k = t.target_set_size;
+    if (!motByK[k]) motByK[k] = {hits: 0, possible: 0, falseAlarms: 0, trials: 0};
+    motByK[k].hits += t.hits || 0;
+    motByK[k].possible += k;
+    motByK[k].falseAlarms += t.false_alarms || 0;
+    motByK[k].trials += 1;
+  }
+  const motAccByK = {};
+  for (const k in motByK) motAccByK[k] = motByK[k].hits / motByK[k].possible;
+  // Capacity estimate: K × (2*p - 1) corrected-for-guessing average, averaged across K.
+  // This is the standard Hulleman / Scholl-style estimator.
+  const motKs = Object.keys(motByK).map(Number).sort();
+  let motCapacity = null;
+  if (motKs.length) {
+    const caps = motKs.map(k => k * (2 * motAccByK[k] - 1));
+    motCapacity = caps.reduce((a,b)=>a+b,0) / caps.length;
+  }
+
+  // ----- Enumeration -----
+  const enumMain = data.filter(t => t.phase === 'enum_main');
+  const enumByN = {};
+  for (const t of enumMain) {
+    const n = t.n_dots;
+    if (!enumByN[n]) enumByN[n] = {trials: [], correct: 0, errors: []};
+    enumByN[n].trials.push(t);
+    if (t.correct) enumByN[n].correct++;
+    if (typeof t.error === 'number') enumByN[n].errors.push(t.error);
+  }
+  const enumStats = {};
+  for (const n in enumByN) {
+    enumStats[n] = {
+      n_trials: enumByN[n].trials.length,
+      accuracy: enumByN[n].correct / enumByN[n].trials.length,
+      mean_error: enumByN[n].errors.length
+        ? enumByN[n].errors.reduce((a,b)=>a+b,0) / enumByN[n].errors.length
+        : 0,
+      mean_abs_error: enumByN[n].errors.length
+        ? enumByN[n].errors.reduce((a,b)=>a+Math.abs(b),0) / enumByN[n].errors.length
+        : 0
+    };
+  }
+  // Subitising threshold: highest contiguous N starting from 1 where acc >= 0.75
+  let subitThresh = 0;
+  for (let n = 1; n <= 9; n++) {
+    if (enumStats[n] && enumStats[n].accuracy >= 0.75) subitThresh = n;
+    else break;
+  }
+
+  // ----- Digit span -----
+  const dsTrials = data.filter(t => t.phase === 'digit_span');
+  const dsCorrectByLen = {};
+  for (const t of dsTrials) {
+    const L = t.span_length;
+    if (!dsCorrectByLen[L]) dsCorrectByLen[L] = {correct: 0, total: 0};
+    dsCorrectByLen[L].total++;
+    if (t.correct) dsCorrectByLen[L].correct++;
+  }
+  const dsMaxAttempted = dsTrials.length ? Math.max(...dsTrials.map(t => t.span_length)) : 0;
+  const dsMaxCorrect = Math.max(0, ...dsTrials.filter(t => t.correct).map(t => t.span_length));
+
+  // ----- Data-quality flags -----
+  const flags = [];
+  if (filledCells < totalCells) {
+    flags.push({severity: 'info', text: `${totalCells - filledCells} of ${totalCells} condition×magnitude cells are empty. Expected with a small item set; the full 60-item study fills all cells.`});
+  }
+  if (compMainAcc !== null && compMainAcc < 0.7) {
+    flags.push({severity: 'warning', text: `Main-block comprehension accuracy ${(compMainAcc*100).toFixed(0)}% is below 70%. Consider excluding this participant.`});
+  }
+  // Short demographic fields
+  for (const [k, v] of Object.entries(demoText)) {
+    if (typeof v === 'string' && v.trim().length < 2 && k !== 'other_lang') {
+      flags.push({severity: 'warning', text: `Demographic field "${k}" has very short response: "${v}". Possible inattentive responding.`});
+    }
+  }
+  // Age plausibility
+  const ageNum = parseInt(demoText.age, 10);
+  if (demoText.age && (isNaN(ageNum) || ageNum < 18 || ageNum > 100)) {
+    flags.push({severity: 'warning', text: `Age field "${demoText.age}" is implausible.`});
+  }
+  // Abrupt enumeration drops (≥60 percentage points between adjacent N)
+  for (let n = 1; n <= 8; n++) {
+    if (enumStats[n] && enumStats[n+1] &&
+        enumStats[n].accuracy - enumStats[n+1].accuracy >= 0.6) {
+      flags.push({severity: 'info', text: `Enumeration accuracy drops sharply from N=${n} (${(enumStats[n].accuracy*100).toFixed(0)}%) to N=${n+1} (${(enumStats[n+1].accuracy*100).toFixed(0)}%) — abrupt rather than gradual.`});
+    }
+  }
+  // MOT non-monotonicity
+  if (motKs.length >= 2) {
+    const accs = motKs.map(k => motAccByK[k]);
+    for (let i = 0; i < accs.length - 1; i++) {
+      if (accs[i+1] - accs[i] > 0.15) {
+        flags.push({severity: 'info', text: `MOT accuracy is non-monotonic: rises from k=${motKs[i]} (${(accs[i]*100).toFixed(0)}%) to k=${motKs[i+1]} (${(accs[i+1]*100).toFixed(0)}%). Possible practice effect.`});
+        break;
+      }
+    }
+  }
+  // SPR practice accuracy proxy: very fast or very slow per-word RT
+  const allMainRTs = sprMain.flatMap(t => (t.word_rts || []).map(w => w.rt_ms));
+  if (allMainRTs.length) {
+    const meanRT = allMainRTs.reduce((a,b)=>a+b,0)/allMainRTs.length;
+    if (meanRT < 200) flags.push({severity: 'warning', text: `Mean per-word reading time is ${meanRT.toFixed(0)} ms — implausibly fast. Possible button-mashing.`});
+    if (meanRT > 2500) flags.push({severity: 'info', text: `Mean per-word reading time is ${meanRT.toFixed(0)} ms — unusually slow.`});
+  }
+
+  return {
+    subjectId: sid,
+    language: lang,
+    languageName: langName,
+    totalTrials: data.length,
+    durationMs,
+    durationStr: formatDuration(durationMs),
+    demographics: {
+      ...demoText,
+      education: demoEdu.education || '(not recorded)',
+      ...demoMC
+    },
+    spr: {
+      criticalTrials: sprMain.length,
+      conditions, magnitudes,
+      cellStats, condMarginal, magMarginal,
+      meanRT: allMainRTs.length ? allMainRTs.reduce((a,b)=>a+b,0)/allMainRTs.length : null
+    },
+    comprehension: {
+      total: comps.length, correct: comps.filter(c => c.correct).length,
+      accuracy: compAcc,
+      mainTotal: compMain.length, mainAccuracy: compMainAcc
+    },
+    mot: { byK: motByK, accByK: motAccByK, capacity: motCapacity, ks: motKs },
+    enumeration: { stats: enumStats, subitThresh, total: enumMain.length },
+    digitSpan: {
+      byLength: dsCorrectByLen,
+      maxAttempted: dsMaxAttempted,
+      maxCorrect: dsMaxCorrect,
+      totalTrials: dsTrials.length
+    },
+    flags
+  };
+}
+
+
+/* -------------------------------------------------------------------------
+ * Render the analysis as HTML for in-browser display.
+ * ------------------------------------------------------------------------- */
+function renderSummaryHTML(s){
+  const fmtMs = (v) => v === null || v === undefined ? '—' : Math.round(v) + ' ms';
+  const fmtPct = (v) => v === null || v === undefined ? '—' : (v*100).toFixed(0) + '%';
+
+  let html = '<div class="summary-content">';
+  html += '<h2 style="margin-top:0">Session summary</h2>';
+
+  // --- Session ---
+  html += '<section><h3>Session</h3><table class="sum-tbl">';
+  html += `<tr><th>Subject ID</th><td>${s.subjectId}</td></tr>`;
+  html += `<tr><th>Reading language</th><td>${s.languageName}</td></tr>`;
+  html += `<tr><th>Total trials</th><td>${s.totalTrials}</td></tr>`;
+  html += `<tr><th>Session duration</th><td>${s.durationStr}</td></tr>`;
+  html += '</table></section>';
+
+  // --- Demographics ---
+  html += '<section><h3>Demographics</h3><table class="sum-tbl">';
+  const demoOrder = ['age','gender','handedness','country','native_lang','other_lang','education','vision'];
+  for (const k of demoOrder) {
+    if (s.demographics[k] !== undefined) {
+      html += `<tr><th>${k.replace(/_/g,' ')}</th><td>${s.demographics[k] || '—'}</td></tr>`;
+    }
+  }
+  html += '</table></section>';
+
+  // --- Reading task ---
+  html += '<section><h3>Reading task</h3>';
+  html += `<p>Critical trials: ${s.spr.criticalTrials}. `;
+  if (s.spr.meanRT !== null) html += `Mean per-word reading time: <strong>${fmtMs(s.spr.meanRT)}</strong>. `;
+  html += `Comprehension: <strong>${fmtPct(s.comprehension.mainAccuracy)}</strong> on main block (${s.comprehension.correct}/${s.comprehension.total} overall including practice).</p>`;
+
+  // Crosstab
+  if (s.spr.conditions.length && s.spr.magnitudes.length) {
+    html += '<h4>Critical-word RT by condition × magnitude (mean ms, n)</h4>';
+    html += '<table class="sum-tbl crosstab"><thead><tr><th></th>';
+    for (const m of s.spr.magnitudes) html += `<th>mag=${m}</th>`;
+    html += '<th>marginal</th></tr></thead><tbody>';
+    for (const c of s.spr.conditions) {
+      html += `<tr><th>${c}</th>`;
+      for (const m of s.spr.magnitudes) {
+        const cell = s.spr.cellStats[c][m];
+        if (cell) html += `<td>${Math.round(cell.mean)}<span class="cell-n"> (${cell.n})</span></td>`;
+        else html += '<td class="empty">—</td>';
+      }
+      const cm = s.spr.condMarginal[c];
+      html += `<td class="marginal">${cm ? Math.round(cm.mean) : '—'}<span class="cell-n"> (${cm ? cm.n : 0})</span></td></tr>`;
+    }
+    // Magnitude marginals row
+    html += '<tr><th class="marginal">marginal</th>';
+    for (const m of s.spr.magnitudes) {
+      const mm = s.spr.magMarginal[m];
+      html += `<td class="marginal">${mm ? Math.round(mm.mean) : '—'}<span class="cell-n"> (${mm ? mm.n : 0})</span></td>`;
+    }
+    html += '<td></td></tr>';
+    html += '</tbody></table>';
+  }
+  html += '</section>';
+
+  // --- MOT ---
+  html += '<section><h3>Multiple-object tracking</h3>';
+  html += '<table class="sum-tbl"><thead><tr><th>k</th><th>trials</th><th>hits/possible</th><th>accuracy</th></tr></thead><tbody>';
+  for (const k of s.mot.ks) {
+    const b = s.mot.byK[k];
+    html += `<tr><td>${k}</td><td>${b.trials}</td><td>${b.hits}/${b.possible}</td><td>${fmtPct(s.mot.accByK[k])}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  if (s.mot.capacity !== null) {
+    html += `<p>Estimated tracking capacity (K(2p − 1) averaged over k): <strong>${s.mot.capacity.toFixed(2)}</strong></p>`;
+  }
+  html += '</section>';
+
+  // --- Enumeration ---
+  html += '<section><h3>Enumeration</h3>';
+  html += '<table class="sum-tbl"><thead><tr><th>N</th><th>trials</th><th>accuracy</th><th>mean error</th></tr></thead><tbody>';
+  for (let n = 1; n <= 9; n++) {
+    const e = s.enumeration.stats[n];
+    if (!e) continue;
+    const errStr = e.mean_error > 0 ? '+' + e.mean_error.toFixed(2) : e.mean_error.toFixed(2);
+    html += `<tr><td>${n}</td><td>${e.n_trials}</td><td>${fmtPct(e.accuracy)}</td><td>${errStr}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  html += `<p>Subitising threshold (highest N with ≥75% accuracy, contiguous from 1): <strong>N = ${s.enumeration.subitThresh || '—'}</strong></p>`;
+  html += '</section>';
+
+  // --- Digit span ---
+  html += '<section><h3>Reverse digit span</h3>';
+  html += '<table class="sum-tbl"><thead><tr><th>length</th><th>correct/total</th></tr></thead><tbody>';
+  const lengths = Object.keys(s.digitSpan.byLength).map(Number).sort();
+  for (const L of lengths) {
+    const b = s.digitSpan.byLength[L];
+    html += `<tr><td>${L}</td><td>${b.correct}/${b.total}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  html += `<p>Maximum span length with at least one correct trial: <strong>${s.digitSpan.maxCorrect || '—'}</strong></p>`;
+  html += '</section>';
+
+  // --- Flags ---
+  if (s.flags.length) {
+    html += '<section><h3>Data-quality flags</h3><ul class="flags">';
+    for (const f of s.flags) {
+      html += `<li class="flag-${f.severity}"><strong>${f.severity.toUpperCase()}:</strong> ${f.text}</li>`;
+    }
+    html += '</ul></section>';
+  } else {
+    html += '<section><h3>Data-quality flags</h3><p>None.</p></section>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+
+/* -------------------------------------------------------------------------
+ * Render the analysis as plain text (for the clipboard / TXT export).
+ * ------------------------------------------------------------------------- */
+function renderSummaryText(s){
+  const pad = (s, n) => String(s).padEnd(n);
+  const lpad = (s, n) => String(s).padStart(n);
+  const lines = [];
+  lines.push('SESSION SUMMARY — Topology of Grammar, Study 1');
+  lines.push('='.repeat(60));
+  lines.push(`Subject ID:       ${s.subjectId}`);
+  lines.push(`Reading language: ${s.languageName}`);
+  lines.push(`Total trials:     ${s.totalTrials}`);
+  lines.push(`Duration:         ${s.durationStr}`);
+  lines.push('');
+  lines.push('DEMOGRAPHICS');
+  lines.push('-'.repeat(60));
+  const demoOrder = ['age','gender','handedness','country','native_lang','other_lang','education','vision'];
+  for (const k of demoOrder) {
+    if (s.demographics[k] !== undefined) {
+      lines.push(`  ${pad(k, 16)} ${s.demographics[k] || '—'}`);
+    }
+  }
+  lines.push('');
+  lines.push('READING TASK');
+  lines.push('-'.repeat(60));
+  lines.push(`  Critical trials:           ${s.spr.criticalTrials}`);
+  if (s.spr.meanRT !== null) lines.push(`  Mean per-word RT:          ${Math.round(s.spr.meanRT)} ms`);
+  if (s.comprehension.mainAccuracy !== null) {
+    lines.push(`  Main-block comprehension:  ${(s.comprehension.mainAccuracy*100).toFixed(1)}%`);
+  }
+  lines.push('');
+  if (s.spr.conditions.length && s.spr.magnitudes.length) {
+    lines.push('  Critical-word RT (ms), by condition × magnitude:');
+    let header = '  ' + pad('', 24);
+    for (const m of s.spr.magnitudes) header += lpad('mag=' + m, 8);
+    header += lpad('marg', 8);
+    lines.push(header);
+    for (const c of s.spr.conditions) {
+      let row = '  ' + pad(c, 24);
+      for (const m of s.spr.magnitudes) {
+        const cell = s.spr.cellStats[c][m];
+        row += lpad(cell ? Math.round(cell.mean) + '(' + cell.n + ')' : '—', 8);
+      }
+      const cm = s.spr.condMarginal[c];
+      row += lpad(cm ? Math.round(cm.mean) + '(' + cm.n + ')' : '—', 8);
+      lines.push(row);
+    }
+  }
+  lines.push('');
+  lines.push('MOT');
+  lines.push('-'.repeat(60));
+  for (const k of s.mot.ks) {
+    const b = s.mot.byK[k];
+    lines.push(`  k=${k}: ${b.trials} trials, ${b.hits}/${b.possible} hits, accuracy ${(s.mot.accByK[k]*100).toFixed(0)}%`);
+  }
+  if (s.mot.capacity !== null) {
+    lines.push(`  Capacity estimate: ${s.mot.capacity.toFixed(2)}`);
+  }
+  lines.push('');
+  lines.push('ENUMERATION');
+  lines.push('-'.repeat(60));
+  for (let n = 1; n <= 9; n++) {
+    const e = s.enumeration.stats[n];
+    if (!e) continue;
+    const errStr = e.mean_error >= 0 ? '+' + e.mean_error.toFixed(2) : e.mean_error.toFixed(2);
+    lines.push(`  N=${n}: ${e.n_trials} trials, accuracy ${(e.accuracy*100).toFixed(0)}%, mean error ${errStr}`);
+  }
+  lines.push(`  Subitising threshold: N = ${s.enumeration.subitThresh || '—'}`);
+  lines.push('');
+  lines.push('DIGIT SPAN (REVERSE)');
+  lines.push('-'.repeat(60));
+  for (const L of Object.keys(s.digitSpan.byLength).map(Number).sort()) {
+    const b = s.digitSpan.byLength[L];
+    lines.push(`  length=${L}: ${b.correct}/${b.total} correct`);
+  }
+  lines.push(`  Max correct length: ${s.digitSpan.maxCorrect || '—'}`);
+  lines.push('');
+  if (s.flags.length) {
+    lines.push('DATA-QUALITY FLAGS');
+    lines.push('-'.repeat(60));
+    for (const f of s.flags) {
+      lines.push(`  [${f.severity.toUpperCase()}] ${f.text}`);
+    }
+  } else {
+    lines.push('DATA-QUALITY FLAGS: none');
+  }
+  lines.push('');
+  return lines.join('\n');
+}
+
+
+const jsPsych = initJsPsych({
+  show_progress_bar: false,
+  on_finish: () => {
+    sessionInProgress = false;     // allow tab-close now
+    const rawData = jsPsych.data.get().values();
+    const cleanData = cleanDataForExport(rawData);
+    const sessionData = {
+      subjectId,
+      deployment: DEPLOYMENT_CONFIG,
+      submittedAt: new Date().toISOString(),
+      data: cleanData
+    };
+    const jsonStr = JSON.stringify(sessionData, null, 2);
+
+    // ----- Compute analysis (lazy) -----
+    let analysis = null, summaryHTML = null, summaryText = null;
+    const ensureAnalysis = () => {
+      if (!analysis) {
+        analysis = analyseSession(sessionData);
+        summaryHTML = renderSummaryHTML(analysis);
+        summaryText = renderSummaryText(analysis);
+      }
+    };
+
+    // ----- Route data: JATOS > POST > download -----
+    let submissionStatus = 'pending';
+    let submissionMessage = '';
+
+    const writeFinalScreen = () => {
+      const jsonBlob = new Blob([jsonStr], {type: 'application/json'});
+      const jsonUrl = URL.createObjectURL(jsonBlob);
+      let statusBanner = '';
+      if (submissionStatus === 'sent') {
+        statusBanner = `<div class="status-banner status-ok">✓ Your data has been submitted to the experimenter. ${submissionMessage}</div>`;
+      } else if (submissionStatus === 'failed') {
+        statusBanner = `<div class="status-banner status-warn">⚠ Automatic submission failed (${submissionMessage}). Please download the file below and email it to the experimenter.</div>`;
+      } else if (submissionStatus === 'local') {
+        statusBanner = `<div class="status-banner">Please download your data file and send it to the experimenter.</div>`;
+      }
+
+      document.body.innerHTML = `
+        <div class="final-shell">
+          <div class="final-card">
+            <h1>Thank you.</h1>
+            <p class="lede">Your session is complete.</p>
+            ${statusBanner}
+            <div class="final-buttons">
+              <a id="dl-json" class="btn-primary" href="${jsonUrl}" download="topology_subject_${subjectId}.json">Download data (JSON)</a>
+              <button id="show-summary" class="btn-secondary">Show analysis summary</button>
+            </div>
+            <p class="muted final-sid">Session ID: ${subjectId}</p>
+            <div id="summary-region" style="display:none"></div>
+          </div>
+        </div>`;
+
+      document.getElementById('show-summary').addEventListener('click', () => {
+        ensureAnalysis();
+        const region = document.getElementById('summary-region');
+        const btn = document.getElementById('show-summary');
+        if (region.style.display === 'none') {
+          region.innerHTML = summaryHTML +
+            '<div class="summary-actions">' +
+            '<button id="copy-summary" class="btn-secondary">Copy summary as text</button>' +
+            '<button id="dl-summary" class="btn-secondary">Download summary (TXT)</button>' +
+            '</div>';
+          region.style.display = 'block';
+          btn.textContent = 'Hide analysis summary';
+          document.getElementById('copy-summary').addEventListener('click', () => {
+            navigator.clipboard.writeText(summaryText).then(() => {
+              const b = document.getElementById('copy-summary');
+              b.textContent = 'Copied ✓';
+              setTimeout(() => { b.textContent = 'Copy summary as text'; }, 1500);
+            }).catch(() => alert('Clipboard access denied. Please use the download button.'));
+          });
+          document.getElementById('dl-summary').addEventListener('click', () => {
+            const txtBlob = new Blob([summaryText], {type: 'text/plain'});
+            const txtUrl = URL.createObjectURL(txtBlob);
+            const a = document.createElement('a');
+            a.href = txtUrl;
+            a.download = 'topology_summary_' + subjectId + '.txt';
+            a.click();
+            URL.revokeObjectURL(txtUrl);
+          });
+        } else {
+          region.style.display = 'none';
+          btn.textContent = 'Show analysis summary';
+        }
+      });
+    };
+
+    if (DEPLOYMENT_CONFIG.usingJatos) {
+      // Mode 1: JATOS
+      window.jatos.submitResultData(jsonStr)
+        .then(() => {
+          submissionStatus = 'sent';
+          submissionMessage = 'You may close this tab.';
+          writeFinalScreen();
+          setTimeout(() => window.jatos.endStudy(jsonStr), 2000);
+        })
+        .catch((err) => {
+          submissionStatus = 'failed';
+          submissionMessage = 'JATOS submission error: ' + (err && err.message ? err.message : 'unknown');
+          writeFinalScreen();
+        });
+    } else if (DEPLOYMENT_CONFIG.postEndpoint) {
+      // Mode 2: POST to custom endpoint
+      fetch(DEPLOYMENT_CONFIG.postEndpoint, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: jsonStr
+      }).then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        submissionStatus = 'sent';
+        submissionMessage = '';
+        writeFinalScreen();
+      }).catch(err => {
+        submissionStatus = 'failed';
+        submissionMessage = err.message || 'network error';
+        writeFinalScreen();
+      });
+    } else {
+      // Mode 3: browser download
+      submissionStatus = 'local';
+      writeFinalScreen();
+    }
+  }
+});
+jsPsych.data.addProperties({ subjectId });
+
+
+/* =========================================================================
+ * PART 5 — Build trial variable arrays
+ * ========================================================================= */
+
+const enPracticeVars = [
+  {sentence:'The quiet stream wound its way through the valley.',  item_id:'pe1', comp_q:'Was the stream loud?',       comp_ans:'No'},
+  {sentence:'A small fox darted across the empty road at dusk.',   item_id:'pe2', comp_q:'Did the fox cross a road?',  comp_ans:'Yes'},
+  {sentence:'The traveller carried a heavy bag along the path.',   item_id:'pe3', comp_q:null, comp_ans:null},
+  {sentence:'In the morning the wind rattled the loose shutters.', item_id:'pe4', comp_q:null, comp_ans:null}
+].map(v => ({...v, language:'en', condition:'practice', magnitude:0, critical_word_index:-1}));
+
+const bnPracticeVars = [
+  {sentence:'শান্ত নদী উপত্যকার মধ্যে দিয়ে বয়ে যায়।',           item_id:'pb1', comp_q:'নদী কি শান্ত ছিল?', comp_ans:'হ্যাঁ'},
+  {sentence:'এক ছোট শেয়াল সন্ধ্যায় ফাঁকা রাস্তা পার হলো।',         item_id:'pb2', comp_q:'শেয়াল কি বড় ছিল?', comp_ans:'না'},
+  {sentence:'যাত্রী পথের ধারে একটি ভারী ব্যাগ বহন করছিল।',         item_id:'pb3', comp_q:null, comp_ans:null},
+  {sentence:'সকালে বাতাসে আলগা জানালার পাল্লা ঝনঝন করছিল।',         item_id:'pb4', comp_q:null, comp_ans:null}
+].map(v => ({...v, language:'bn', condition:'practice', magnitude:0, critical_word_index:-1}));
+
+const enCritVars = buildCriticalTrials(EN_ITEMS, 'en', subjectId);
+const bnCritVars = buildCriticalTrials(BN_ITEMS, 'bn', subjectId);
+const enFillerVars = EN_FILLERS.map((s, i) => ({
+  sentence: s, item_id: 'fe'+(i+1), language: 'en',
+  condition: 'filler', magnitude: 0, critical_word_index: -1,
+  comp_q: null, comp_ans: null
+}));
+const bnFillerVars = BN_FILLERS.map((s, i) => ({
+  sentence: s, item_id: 'fb'+(i+1), language: 'bn',
+  condition: 'filler', magnitude: 0, critical_word_index: -1,
+  comp_q: null, comp_ans: null
+}));
+
+const enMainVars = jsPsych.randomization.shuffle([...enCritVars, ...enFillerVars]);
+const bnMainVars = jsPsych.randomization.shuffle([...bnCritVars, ...bnFillerVars]);
+
+
+/* =========================================================================
+ * PART 6 — SPR trial template (parameterised by phase)
+ * ========================================================================= */
+
+function sprTrialArray(phase, isBN){
+  return [
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div class="fixation">+</div>',
+      choices: 'NO_KEYS',
+      trial_duration: 600
+    },
+    {
+      type: MovingWindowSPRPlugin,
+      sentence:            jsPsych.timelineVariable('sentence'),
+      language:            jsPsych.timelineVariable('language'),
+      condition:           jsPsych.timelineVariable('condition'),
+      magnitude:           jsPsych.timelineVariable('magnitude'),
+      item_id:             jsPsych.timelineVariable('item_id'),
+      critical_word_index: jsPsych.timelineVariable('critical_word_index'),
+      data: { phase: phase }
+    },
+    {
+      timeline: [{
+        type: jsPsychHtmlButtonResponse,
+        stimulus: () => {
+          const q = jsPsych.evaluateTimelineVariable('comp_q');
+          return '<div class="compq ' + (isBN ? 'bn' : '') + '">' + q + '</div>';
+        },
+        choices: isBN ? ['হ্যাঁ','না'] : ['Yes','No'],
+        data: () => ({
+          phase: phase + '_comp',
+          item_id: jsPsych.evaluateTimelineVariable('item_id'),
+          comp_ans: jsPsych.evaluateTimelineVariable('comp_ans')
+        }),
+        on_finish: (d) => {
+          const labels = isBN ? ['হ্যাঁ','না'] : ['Yes','No'];
+          d.response_label = labels[d.response];
+          d.correct = (d.response_label === d.comp_ans);
+        }
+      }],
+      conditional_function: () => jsPsych.evaluateTimelineVariable('comp_q') !== null
+    }
+  ];
+}
+
+
+/* =========================================================================
+ * PART 7 — SPR instructions (one per language)
+ * ========================================================================= */
+
+const sprInstructionsEN = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div class="smallcaps">Task 1 of 4 — Reading</div>
+    <h2>Reading sentences, one word at a time</h2>
+    <p>You will read short sentences. Each sentence appears with all the words hidden behind underscores. Pressing the <span class="kbd">SPACE</span> bar reveals one word at a time — when you reveal a new word, the previous one is hidden again. <strong>Only one word is visible at any moment.</strong></p>
+    <div class="demo">
+      <div class="demo-label">Step-by-step demonstration</div>
+      <div class="demo-row-label">Before you press anything:</div>
+      <div class="demo-row"><span style="color:#a39d92">_____ ____ __ ________ ___ __ _ ____</span></div>
+      <div class="demo-arrow">↓ press SPACE</div>
+      <div class="demo-row-label">After your first press:</div>
+      <div class="demo-row"><span style="color:#1c1a17;font-weight:600">Words</span> <span style="color:#a39d92">____ __ ________ ___ __ _ ____</span></div>
+      <div class="demo-arrow">↓ press SPACE</div>
+      <div class="demo-row-label">After your second press:</div>
+      <div class="demo-row"><span style="color:#a39d92">_____</span> <span style="color:#1c1a17;font-weight:600">will</span> <span style="color:#a39d92">__ ________ ___ __ _ ____</span></div>
+      <div class="demo-arrow">…and so on, until the sentence ends</div>
+    </div>
+    <p>Read at a comfortable, natural pace — neither rushing nor pausing.</p>
+    <p>After some sentences you will see a <strong>yes / no comprehension question</strong> about what you just read. Answer honestly — accuracy is recorded but a few mistakes are entirely expected.</p>
+    <div class="callout">Keep one finger near the <span class="kbd">SPACE</span> bar throughout the task. Use the same finger every time.</div>
+    <p>You will start with <strong>4 practice sentences</strong>, then move on to the main block (about 18 sentences). The whole task takes around 20 minutes.</p>`,
+  choices: ['Start practice']
+};
+
+const sprInstructionsBN = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div class="smallcaps">Task 1 of 4 — Reading</div>
+    <h2>Reading sentences, one word at a time</h2>
+    <p>You will read short Bengali sentences. Each sentence appears with all the words hidden behind dotted circles. Pressing the <span class="kbd">SPACE</span> bar reveals one word at a time — when you reveal a new word, the previous one is hidden again. <strong>Only one word is visible at any moment.</strong></p>
+    <div class="demo">
+      <div class="demo-label">Step-by-step demonstration</div>
+      <div class="demo-row-label">Before you press anything:</div>
+      <div class="demo-row bn"><span style="color:#a39d92">◌◌◌◌ ◌◌◌ ◌◌◌◌◌◌◌◌◌ ◌◌◌◌ ◌◌◌ ◌◌◌◌</span></div>
+      <div class="demo-arrow">↓ press SPACE</div>
+      <div class="demo-row-label">After your first press:</div>
+      <div class="demo-row bn"><span style="color:#1c1a17;font-weight:600">শান্ত</span> <span style="color:#a39d92">◌◌◌ ◌◌◌◌◌◌◌◌◌ ◌◌◌◌ ◌◌◌ ◌◌◌◌</span></div>
+      <div class="demo-arrow">↓ press SPACE</div>
+      <div class="demo-row-label">After your second press:</div>
+      <div class="demo-row bn"><span style="color:#a39d92">◌◌◌◌</span> <span style="color:#1c1a17;font-weight:600">নদী</span> <span style="color:#a39d92">◌◌◌◌◌◌◌◌◌ ◌◌◌◌ ◌◌◌ ◌◌◌◌</span></div>
+      <div class="demo-arrow">…বাক্যটি শেষ না হওয়া পর্যন্ত চলবে</div>
+    </div>
+    <p>স্বাভাবিক, স্বচ্ছন্দ গতিতে পড়ুন — তাড়াহুড়ো বা থেমে থেমে নয়।</p>
+    <p>কিছু বাক্যের পরে একটি <strong>হ্যাঁ / না প্রশ্ন</strong> দেখানো হবে। সততার সঙ্গে উত্তর দিন।</p>
+    <div class="callout">পুরো কাজে <span class="kbd">SPACE</span> বারের কাছে একই আঙুল রাখুন।</div>
+    <p>প্রথমে <strong>৪টি অনুশীলন বাক্য</strong>, তারপর মূল ব্লক (প্রায় ১৮টি বাক্য)। সময় লাগবে প্রায় ২০ মিনিট।</p>`,
+  choices: ['অনুশীলন শুরু করুন']
+};
+
+
+/* =========================================================================
+ * PART 8 — Language-conditional procedures
+ * ========================================================================= */
+
+const englishSPRBlock = {
+  timeline: [
+    sprInstructionsEN,
+    { timeline: sprTrialArray('practice_en', false), timeline_variables: enPracticeVars },
+    {
+      type: jsPsychHtmlButtonResponse,
+      stimulus: `<h2>Practice complete</h2>
+                 <p>You're ready for the main reading block. There are about ${enMainVars.length} sentences. Take your time, read naturally, and answer the comprehension questions honestly.</p>`,
+      choices: ['Begin main block']
+    },
+    { timeline: sprTrialArray('main_en', false), timeline_variables: enMainVars, randomize_order: true }
+  ],
+  conditional_function: () => selectedLanguage === 'en'
+};
+
+const bengaliSPRBlock = {
+  timeline: [
+    sprInstructionsBN,
+    { timeline: sprTrialArray('practice_bn', true), timeline_variables: bnPracticeVars },
+    {
+      type: jsPsychHtmlButtonResponse,
+      stimulus: `<h2>অনুশীলন সম্পন্ন</h2>
+                 <p>মূল পঠন ব্লকের জন্য প্রস্তুত। প্রায় ${bnMainVars.length}টি বাক্য আছে। ধীরে-সুস্থে স্বাভাবিকভাবে পড়ুন এবং প্রশ্নগুলির উত্তর সততার সঙ্গে দিন।</p>`,
+      choices: ['মূল ব্লক শুরু করুন']
+    },
+    { timeline: sprTrialArray('main_bn', true), timeline_variables: bnMainVars, randomize_order: true }
+  ],
+  conditional_function: () => selectedLanguage === 'bn'
+};
+
+
+/* =========================================================================
+ * PART 9 — Common (post-SPR) procedures
+ * ========================================================================= */
+
+const breakNote = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `<h2>Halfway through</h2>
+             <p>You've finished the reading task. Take a short break if you'd like — stretch, look away from the screen for a moment.</p>
+             <p>The next three tasks are visual: tracking moving disks, counting briefly-shown dots, and remembering short digit sequences. Together they take about 20 minutes.</p>`,
+  choices: ['Continue']
+};
+
+const motInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div class="smallcaps">Task 2 of 4 — Tracking</div>
+    <h2>Tracking moving disks</h2>
+    <p>Eight black disks will appear on the screen. A few of them will briefly flash <strong style="color:#3aa055">green</strong> — those are the <em>targets</em> you need to keep track of.</p>
+    <p>All eight disks will then look identical and start moving in random directions, bouncing off the walls and each other. Your job is to <strong>keep your eyes on the targets</strong> — mentally label them — while they move.</p>
+    <p>When the disks stop, click each disk you believe was a target. Click again to deselect. Once you have selected the right number, press <span class="kbd">ENTER</span> to confirm.</p>
+    <ol class="steps">
+      <li><span class="num">1</span>Eight disks appear; some flash green for 2 seconds.</li>
+      <li><span class="num">2</span>All disks turn black and move for about 7 seconds.</li>
+      <li><span class="num">3</span>The disks stop. Click the ones you were tracking.</li>
+      <li><span class="num">4</span>Press <span class="kbd">ENTER</span> to confirm your selection.</li>
+    </ol>
+    <div class="callout">It is very common to lose a target. Just guess on the ones you're unsure about. Brief feedback follows each trial.</div>
+    <p>You'll do <strong>one practice trial</strong>, then 18 main trials (6 at each set size).</p>`,
+  choices: ['Start practice trial']
+};
+
+const motPractice = {
+  type: MOTPlugin,
+  n_objects: 8, n_targets: 3,
+  tracking_duration_ms: 5000, speed: 2.5,
+  data: { phase: 'mot_practice' }
+};
+
+const motMainStart = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `<h2>Ready for the main MOT trials</h2>
+             <p>The real trials are a little faster, and you'll need to track between 3 and 5 disks. There are 18 trials in total — this section takes about 5–6 minutes.</p>`,
+  choices: ['Begin']
+};
+
+const motMainTrials = [];
+for(const k of [3, 4, 5]){
+  for(let i=0;i<6;i++){             // v4: 6 trials per k (up from 3) for noise reduction
+    motMainTrials.push({
+      type: MOTPlugin,
+      n_objects: 8, n_targets: k,
+      tracking_duration_ms: 7000, speed: 3.5,
+      data: { phase: 'mot_main', target_set_size: k }
+    });
+  }
+}
+const shuffledMOTMain = jsPsych.randomization.shuffle(motMainTrials);
+
+const enumInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div class="smallcaps">Task 3 of 4 — Counting</div>
+    <h2>How many dots?</h2>
+    <p>You will briefly see a group of black dots — somewhere between 1 and 9 of them. The display is fast (about a sixth of a second), then a pattern of random shapes will replace it.</p>
+    <p>Right after, you'll type how many dots you saw and press <span class="kbd">ENTER</span>.</p>
+    <div class="callout">The display is too brief to count individually. Just respond with your best estimate — speed and accuracy both matter.</div>
+    <p>You'll do <strong>two practice trials</strong>, then about 22 main trials. The task takes around 5 minutes.</p>`,
+  choices: ['Begin practice']
+};
+
+const enumPracticeTrials = [
+  { type: EnumerationPlugin, n_dots: 2, data: { phase: 'enum_practice' } },
+  { type: EnumerationPlugin, n_dots: 5, data: { phase: 'enum_practice' } }
+];
+
+const enumMainStart = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `<h2>Ready for the main counting trials</h2>
+             <p>Stay relaxed and respond with your first instinct.</p>`,
+  choices: ['Begin']
+};
+
+const enumNs = [1,1,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,8,8,9,9];
+const enumMainTrials = jsPsych.randomization.shuffle(enumNs).map(n => ({
+  type: EnumerationPlugin, n_dots: n, data: { phase: 'enum_main' }
+}));
+
+const digitSpanInstructions = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div class="smallcaps">Task 4 of 4 — Memory</div>
+    <h2>Digit sequences in reverse</h2>
+    <p>A sequence of digits will appear one at a time on the screen. Once the sequence ends, type the digits in <strong>reverse</strong> order and press <span class="kbd">ENTER</span>.</p>
+    <div class="demo">
+      <div class="demo-label">Example</div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:.15em;margin:8px 0">Sequence shown: &nbsp; 3 &nbsp; 8 &nbsp; 1</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:.15em;margin:8px 0;color:var(--accent)">You type: &nbsp; 1 8 3</p>
+    </div>
+    <p>The sequences grow longer over time. The task stops automatically when the sequences become too long to remember.</p>`,
+  choices: ['Begin']
+};
+
+let dsLen = 3;
+const digitSpanProcedure = {
+  timeline: [
+    { type: DigitSpanPlugin, span_length: () => dsLen, data: { phase: 'digit_span' } },
+    { type: DigitSpanPlugin, span_length: () => dsLen, data: { phase: 'digit_span' } }
+  ],
+  loop_function: (data) => {
+    const lastTwo = data.values().slice(-2);
+    const correctCount = lastTwo.filter(t => t.correct).length;
+    if(correctCount === 0 || dsLen >= 9) return false;
+    dsLen += 1;
+    return true;
+  }
+};
+
+
+/* =========================================================================
+ * PART 10 — Welcome, demographics, language selection
+ * ========================================================================= */
+
+const welcomeTrial = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div class="smallcaps">Krea Computational Cognition Laboratory</div>
+    <h1>The Topology of Grammar — Study 1</h1>
+    <p class="lede">Welcome, and thank you for taking part. This session has four short tasks and takes about 45 minutes.</p>
+    <p>You will read sentences, track moving disks, briefly see groups of dots, and remember short digit sequences. Please complete the whole session in one sitting, in a quiet place, on a desktop or laptop computer.</p>
+    <div class="callout">You will switch to full-screen mode on the next page. You can leave full-screen and end the session at any time by pressing <span class="kbd">Esc</span> or closing the tab.</div>`,
+  choices: ['Continue']
+};
+
+const fullscreenTrial = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: true,
+  message: '<h2>Full screen</h2><p>The experiment will run in full screen so that there are no distractions. Click below to switch to full-screen mode.</p>',
+  button_label: 'Enter full screen'
+};
+
+const consentTrial = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <h2>Informed consent</h2>
+    <p>By proceeding you confirm that:</p>
+    <ul class="steps">
+      <li><span class="num">✓</span>You are 18 years or older.</li>
+      <li><span class="num">✓</span>You have read the participant information sheet.</li>
+      <li><span class="num">✓</span>You understand your responses are anonymous and will be used for scientific purposes.</li>
+      <li><span class="num">✓</span>You may withdraw at any point by closing the browser tab.</li>
+    </ul>`,
+  choices: ['I consent', 'I do not consent'],
+  on_finish: (data) => {
+    if(data.response === 1){
+      jsPsych.endExperiment('Thank you. The session has ended.');
+    } else {
+      sessionInProgress = true;   // arm the tab-close guard
+    }
+  }
+};
+
+const demographicsTextTrial = {
+  type: jsPsychSurveyText,
+  preamble: '<h2>About you</h2><p>A few questions before we begin. Please answer each field carefully.</p>',
+  questions: [
+    { prompt: 'Age (years; must be 18 or older)',                   name: 'age',         required: true, columns: 8,  placeholder: 'e.g., 25' },
+    { prompt: 'Country of upbringing (full name, not abbreviation)', name: 'country',     required: true, columns: 30, placeholder: 'e.g., India' },
+    { prompt: 'Native language(s) — full names, comma-separated if more than one', name: 'native_lang', required: true, columns: 40, placeholder: 'e.g., Bengali, Hindi' },
+    { prompt: 'Other languages you read fluently',                  name: 'other_lang',  required: false, columns: 40, placeholder: 'e.g., English (optional)' }
+  ],
+  button_label: 'Continue',
+  data: { phase: 'demographics_text' }
+};
+
+const demographicsEducationTrial = {
+  type: jsPsychSurveyMultiChoice,
+  preamble: '<h2>Education</h2>',
+  questions: [{
+    prompt: 'Highest level of education completed (or currently pursuing)',
+    name: 'education',
+    options: [
+      'Primary / Middle school',
+      'High school / Higher secondary',
+      'Undergraduate / Bachelor\'s in progress',
+      'Bachelor\'s degree',
+      'Master\'s in progress',
+      'Master\'s degree',
+      'Doctoral degree in progress',
+      'Doctoral degree',
+      'Other'
+    ],
+    required: true
+  }],
+  button_label: 'Continue',
+  data: { phase: 'demographics_education' }
+};
+
+const demographicsMCTrial = {
+  type: jsPsychSurveyMultiChoice,
+  preamble: '<h2>A few more questions</h2>',
+  questions: [
+    {
+      prompt: 'Gender',
+      name: 'gender',
+      options: ['Woman', 'Man', 'Non-binary', 'Prefer to self-describe', 'Prefer not to say'],
+      required: true
+    },
+    {
+      prompt: 'Handedness',
+      name: 'handedness',
+      options: ['Right-handed', 'Left-handed', 'Ambidextrous', 'Prefer not to say'],
+      required: true
+    },
+    {
+      prompt: 'Do you have normal or corrected-to-normal vision?',
+      name: 'vision',
+      options: ['Yes, normal', 'Yes, currently corrected (glasses or contacts)', 'No / not currently corrected'],
+      required: true
+    }
+  ],
+  button_label: 'Continue',
+  data: { phase: 'demographics_mc' }
+};
+
+const languageSelectionTrial = {
+  type: jsPsychSurveyMultiChoice,
+  preamble: '<h2>Reading-task language</h2><p>The first task is a reading task. Please choose the language you read most fluently. The remaining three tasks do not depend on language.</p>',
+  questions: [{
+    prompt: 'Which language would you like to use for the reading task?',
+    name: 'language_choice',
+    options: ['English', 'বাংলা (Bengali)'],
+    required: true
+  }],
+  button_label: 'Continue',
+  data: { phase: 'language_choice' },
+  on_finish: function(data){
+    // Defensive: handle both named (language_choice) and indexed (Q0) keys.
+    const r = data.response || {};
+    const choice = r.language_choice || r.Q0 || '';
+    selectedLanguage = (choice === 'English') ? 'en' : 'bn';
+    data.language = selectedLanguage;
+    jsPsych.data.addProperties({ language: selectedLanguage });
+  }
+};
+
+
+/* =========================================================================
+ * PART 11 — Debrief
+ * ========================================================================= */
+
+const fullscreenExitTrial = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: false
+};
+
+const commentsTrial = {
+  type: jsPsychSurveyText,
+  preamble: '<h2>One last thing</h2><p>Any comments? Did any sentences feel particularly strange, particularly easy, or unusual in some other way?</p>',
+  questions: [{ prompt: 'Comments (optional)', name: 'comments', rows: 5, columns: 60 }],
+  button_label: 'Submit',
+  data: { phase: 'debrief' }
+};
+
+const finalTrial = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `<h2>You're done.</h2>
+             <p>Thank you for your time and care. Press the button to receive your data file.</p>`,
+  choices: ['Finish']
+};
+
+
+/* =========================================================================
+ * PART 12 — Assemble and run
+ * ========================================================================= */
+
+const timeline = [
+  welcomeTrial,
+  fullscreenTrial,
+  consentTrial,
+  demographicsTextTrial,
+  demographicsEducationTrial,
+  demographicsMCTrial,
+  languageSelectionTrial,
+
+  // Language-conditional SPR blocks — exactly one will run.
+  englishSPRBlock,
+  bengaliSPRBlock,
+
+  breakNote,
+
+  motInstructions,
+  motPractice,
+  motMainStart,
+  ...shuffledMOTMain,
+
+  enumInstructions,
+  ...enumPracticeTrials,
+  enumMainStart,
+  ...enumMainTrials,
+
+  digitSpanInstructions,
+  digitSpanProcedure,
+
+  fullscreenExitTrial,
+  commentsTrial,
+  finalTrial
+];
+
+jsPsych.run(timeline);
+
+</script>
+</body>
+</html>
