@@ -16,8 +16,8 @@ This repository contains the experiment itself, the analysis stub, and the parti
 The experiment is a single static HTML file. To run it locally:
 
 ```bash
-git clone https://github.com/<your-username>/topology-of-grammar.git
-cd topology-of-grammar
+git clone https://github.com/rakesh-sengupta/topology_grammar_study1.git
+cd topology_grammar_study1
 python3 -m http.server 8000     # or any other static server
 # open http://localhost:8000 in your browser
 ```
